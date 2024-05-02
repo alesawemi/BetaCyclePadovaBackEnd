@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAca5CodeFirst.Models;
 
+//test
+
 namespace BetaCycle_Padova
 {
     public class Program
