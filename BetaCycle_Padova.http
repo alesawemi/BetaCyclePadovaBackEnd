@@ -1,0 +1,6 @@
+@BetaCycle_Padova_HostAddress = http://localhost:5150
+
+GET {{BetaCycle_Padova_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
