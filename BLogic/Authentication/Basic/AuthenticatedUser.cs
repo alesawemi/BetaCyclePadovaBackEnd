@@ -17,4 +17,6 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
 
         public string? Name { get; set; }
     }
+
+    //Ciao sono stato modificato Alessio
 }
