@@ -41,20 +41,13 @@ namespace BetaCycle_Padova.Controllers
 
         [HttpPost]
         //IActionResult definisce una sorta di regola per cui io ti ritorno risultati specifici legati al metodo - non sono altro che le risposta HTTP tipiche
-<<<<<<< Updated upstream
-        public async Task<IActionResult> Login(string inputUsername, string InputPassword)
-        //public async Task<IActionResult> Login(LoginCredentials credentials)
-        { LoginCredentials credentials = new LoginCredentials();
-            credentials.Username = inputUsername;
-            credentials.Password = InputPassword;
-      
-=======
+
         //public async Task<IActionResult> Login(string inputUsername, string InputPassword)
         public async Task<IActionResult> Login(LoginCredentials credentials) {
         //{ LoginCredentials credentials = new LoginCredentials();
         //    credentials.Username = inputUsername;
         //    credentials.Password = InputPassword;
->>>>>>> Stashed changes
+
             // usiamo post perché è metodo http che accetta credenziali 
             // poi qui dentro facciamo tutti i nostri controlli
             // questo è il FLOW:
