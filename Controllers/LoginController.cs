@@ -41,12 +41,20 @@ namespace BetaCycle_Padova.Controllers
 
         [HttpPost]
         //IActionResult definisce una sorta di regola per cui io ti ritorno risultati specifici legati al metodo - non sono altro che le risposta HTTP tipiche
+<<<<<<< Updated upstream
         public async Task<IActionResult> Login(string inputUsername, string InputPassword)
         //public async Task<IActionResult> Login(LoginCredentials credentials)
         { LoginCredentials credentials = new LoginCredentials();
             credentials.Username = inputUsername;
             credentials.Password = InputPassword;
       
+=======
+        //public async Task<IActionResult> Login(string inputUsername, string InputPassword)
+        public async Task<IActionResult> Login(LoginCredentials credentials) {
+        //{ LoginCredentials credentials = new LoginCredentials();
+        //    credentials.Username = inputUsername;
+        //    credentials.Password = InputPassword;
+>>>>>>> Stashed changes
             // usiamo post perché è metodo http che accetta credenziali 
             // poi qui dentro facciamo tutti i nostri controlli
             // questo è il FLOW:
@@ -103,7 +111,7 @@ namespace BetaCycle_Padova.Controllers
                                     (
                                         foundCustomer.Result.Value.PasswordHash,
                                         foundCustomer.Result.Value.PasswordSalt
-                                    //non scelgo io UserId perché in tab Credentials sarà foreignKey che collega a User, quindi deve prendere UserId da newUser in tab User
+                                        //non scelgo io UserId perché in tab Credentials sarà foreignKey che collega a User, quindi deve prendere UserId da newUser in tab User
                                     );
 
                                 User newUser = new User
@@ -128,6 +136,10 @@ namespace BetaCycle_Padova.Controllers
                                 {
                                     LoginNlogLogger.Error("Problema con la Migrazione!");
                                     return BadRequest(new { message = "Problema con la Migrazione!" }); // (F) 
+                                    // per ora lasciamo questo messaggio di errore per noi per capire se c'è un problema con la migrazione
+                                    // ma poi andrà tolto/cambiato, cosa se ne fa utente di questa info?
+                                    // si potrebbe pensare di restituire un "errore imprevisto, si prega di riprovare più tardi"
+                                    // e notificare il problema a chi gestisce il sito così che possano intervenire --> ci sarà log error x aiutare
                                 }
                                 #endregion
 
