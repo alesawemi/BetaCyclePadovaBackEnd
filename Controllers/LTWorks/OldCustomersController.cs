@@ -91,6 +91,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // POST: api/OldCustomers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
+        //03-05-2024: DA USARE PER LA REGISTRAZIONE
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {

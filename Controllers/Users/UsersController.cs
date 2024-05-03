@@ -101,8 +101,7 @@ namespace BetaCycle_Padova.Controllers.Users
             catch (DbUpdateException dbex)
             {
                 if (UserExists(user.Id))
-                {
-                    Console.WriteLine("BOHHHHHHHHHHHH");
+                {                    
                     return Conflict(); //CAPIRE COSA TI RESTITUISCE
                 }
                 else

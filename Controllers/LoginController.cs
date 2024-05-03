@@ -14,6 +14,8 @@ using BetaCycle_Padova.Models.Users;
 using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Http.HttpResults;
+using NLog;
+using Logger = NLog.Logger;
 
 namespace BetaCycle_Padova.Controllers
 {
@@ -24,8 +26,9 @@ namespace BetaCycle_Padova.Controllers
         // ! ricorda di aggiungere nel program.cs AddScoped in #region BUILDER
         private readonly OldCustomersController _customersController;
         private readonly UsersController _usersController;
-        private readonly CredentialsController _credentialsController; 
-        
+        private readonly CredentialsController _credentialsController;
+
+        private static Logger LoginNlogLogger = LogManager.GetCurrentClassLogger(); // istanzio il mio Logger qui
 
         public LoginController (OldCustomersController customersController, UsersController usersController, 
             CredentialsController credentialsController)
@@ -43,6 +46,7 @@ namespace BetaCycle_Padova.Controllers
         { LoginCredentials credentials = new LoginCredentials();
             credentials.Username = inputUsername;
             credentials.Password = InputPassword;
+      
             // usiamo post perché è metodo http che accetta credenziali 
             // poi qui dentro facciamo tutti i nostri controlli
             // questo è il FLOW:
@@ -50,7 +54,7 @@ namespace BetaCycle_Padova.Controllers
             // (D) se non c'è email allora controllo "vecchio" db --> (E) se c'è email controlla psw --> (F) LoginOk/PswErrata
             // (G) se è tutto ok fai migrazione a nuovo db 
             // (H) se non c'è email --> NotFound e FrontEnd redirect a Registrati --> sarà un Post con le info da salvare nei db
-            
+
             // !! MANCA REGISTRAZIONE --> HttpPost x OldCustomer in "vecchio" db e User in "nuovo" db
             // --> si possono usare direttamente post in frontend??
 
@@ -58,11 +62,13 @@ namespace BetaCycle_Padova.Controllers
             //E' giusto che l'admin o il tecnico possa intervenire capendo il tipo di errore
             //Intercettare anche accessi abusivi ? 
 
+            LoginNlogLogger.Info("Received login request.");            
+
             try
             {
                 //facciamo ulteriore controllo perché questo check c'è già nel FrontEnd
-                if (credentials.Username != "" && credentials.Password != "")
-                {
+                if ( (credentials.Username != "" && credentials.Password != ""))
+                {                                      
                     // (A)                    
                     var foundUser = FindEmailNew(credentials.Username); // controllo email nel db nuovo 
 
@@ -75,6 +81,7 @@ namespace BetaCycle_Padova.Controllers
                         #region email NON è nel vecchio db --> registrazione
                         if (foundCustomer.Result.Value == null)
                         {
+                            LoginNlogLogger.Error("L'utente non è ancora registrato - reindirizzamento alla page Registrati.");
                             return NotFound(); // (H) //frontend che intercetta questo NotFound deve reindirizzare utente alla pag di registrazione
                         }
                         #endregion
@@ -86,9 +93,10 @@ namespace BetaCycle_Padova.Controllers
                             // (E) se email trovata nel "vecchio" database --> controllo password
                             var passwordInDBHash = foundCustomer.Result.Value.PasswordHash;
                             var passwordInDBSalt = foundCustomer.Result.Value.PasswordSalt;
-                            
+
                             if (VerifyPassword(credentials.Password, passwordInDBSalt, passwordInDBHash))
                             {
+                                LoginNlogLogger.Info("User esiste nel vecchio db - Password OK - Migrazione in corso");
                                 #region migrazione
                                 // (G) se è tutto ok fai migrazione a nuovo db
                                 Models.Users.Credential newCredential = new Models.Users.Credential
@@ -115,16 +123,25 @@ namespace BetaCycle_Padova.Controllers
 
                                 // http post nello User Controller ritorna un CreatedAtAction quando la migrazione ha successo
                                 // ed è difficile accedere alle proprietà di questo tipo per fare qui un controllo sul risultato della migrazione
-                                
+
                                 if (migrateUser.Result == null)
                                 {
+                                    LoginNlogLogger.Error("Problema con la Migrazione!");
                                     return BadRequest(new { message = "Problema con la Migrazione!" }); // (F) 
                                 }
                                 #endregion
-                                
-                                else return Ok(); // (F)
+
+                                else
+                                {
+                                    LoginNlogLogger.Info("Migrazione completata!");
+                                    return Ok(); // (F)
+                                }
                             }
-                            else return BadRequest(new { message = "Credenziali Non Corrette" }); // (F)
+                            else
+                            {
+                                LoginNlogLogger.Error("Credenziali Non Corrette");
+                                return BadRequest(new { message = "Credenziali Non Corrette" }); // (F)
+                            }
                             #endregion
                         }
                         #endregion
@@ -134,6 +151,7 @@ namespace BetaCycle_Padova.Controllers
                     #region email è nel nuovo db --> controllo psw e invio risposta al frontend : LoginOk/Credenziali Non Corrette 
                     else
                     {
+                        LoginNlogLogger.Info("User trovato nel nuovo database --> controllo password");
                         // (B) se email trovata nel "nuovo" database --> controllo password
 
                         // get User by Email non riempe anche il campo Credential di user --> serve get dalla tab Credentials
@@ -142,6 +160,7 @@ namespace BetaCycle_Padova.Controllers
 
                         if (foundCredentials.Result.Value == null)
                         {
+                            LoginNlogLogger.Fatal("Fatal Error");
                             return BadRequest(new { message = "Fatal Error" }); // ha trovato email nel nuovo db ma non c'è password associata
                         }
 
@@ -150,19 +169,30 @@ namespace BetaCycle_Padova.Controllers
 
                         if (VerifyPassword(credentials.Password, passwordInDBSalt, passwordInDBHash))
                         {
+                            LoginNlogLogger.Info("Credenziali corrette");
                             return Ok(); // (C)
                         }
-                        else return BadRequest(new { message = "Credenziali Non Corrette" }); // (C)
+                        else
+                        {
+                            LoginNlogLogger.Error("Credenziali Non Corrette");
+                            return BadRequest(new { message = "Credenziali Non Corrette" }); // (C)
+                        }
                     }
                     #endregion
 
                 }
+                else
+                {                   
+                    LoginNlogLogger.Error("Credenziali Non Fornite");
+                    return BadRequest(new { message = "Credenziali Non Fornite" });
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoginNlogLogger.Error(ex, " - Il Login ha sollevato un'eccezione nel catch");           
             }
 
+            LoginNlogLogger.Error("Errore Grave nel Login.");            
             return BadRequest();
         }
 

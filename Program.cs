@@ -2,6 +2,7 @@ using BetaCycle_Padova.BLogic.Authentication.Basic;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Controllers.LTWorks;
 using BetaCycle_Padova.Controllers.Users;
+using BetaCycle_Padova.Log;
 using BetaCycle_Padova.Models.Mongo;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,8 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAca5CodeFirst.Models;
-
-//test
 
 namespace BetaCycle_Padova
 {
@@ -110,6 +109,11 @@ namespace BetaCycle_Padova
             });
             #endregion
 
+            ////////////Prova gestione errori///////////////////////////
+            #region  NLog per gestire gli eventi / errori
+            //LoggerNLog loggerNLog = new();
+            #endregion
+            //////////////////////////////////////////////////////////////
 
             #region app
 
