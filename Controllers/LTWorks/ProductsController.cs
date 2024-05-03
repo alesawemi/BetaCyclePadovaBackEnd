@@ -9,6 +9,7 @@ using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.LTWorks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using BetaCycle_Padova.BLogic.Authentication.Basic;
 
 namespace BetaCycle_Padova.Controllers.LTWorks
 {
@@ -23,7 +24,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [BasicAuthorizationAttributes]
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
