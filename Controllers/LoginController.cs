@@ -16,6 +16,10 @@ using System.Net.Mail;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NLog;
 using Logger = NLog.Logger;
+using WebAca5CodeFirst.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BetaCycle_Padova.Controllers
 {
@@ -28,14 +32,18 @@ namespace BetaCycle_Padova.Controllers
         private readonly UsersController _usersController;
         private readonly CredentialsController _credentialsController;
 
+        private JwtSettings _jwtSettings;
+
         private static Logger LoginNlogLogger = LogManager.GetCurrentClassLogger(); // istanzio il mio Logger qui
 
         public LoginController (OldCustomersController customersController, UsersController usersController, 
-            CredentialsController credentialsController)
+            CredentialsController credentialsController, JwtSettings jwtSettings)
         {
             _customersController = customersController;
             _usersController = usersController;
             _credentialsController = credentialsController;
+
+            _jwtSettings = jwtSettings;
         }
 
 
@@ -98,7 +106,7 @@ namespace BetaCycle_Padova.Controllers
                             if (VerifyPassword(credentials.Password, passwordInDBSalt, passwordInDBHash))
                             {
                                 LoginNlogLogger.Info("User esiste nel vecchio db - Password OK - Migrazione in corso");
-                                #region migrazione
+                                #region migrazione !! gestire eventuali errori 
                                 // (G) se è tutto ok fai migrazione a nuovo db
                                 Models.Users.Credential newCredential = new Models.Users.Credential
                                     (
@@ -139,7 +147,13 @@ namespace BetaCycle_Padova.Controllers
                                 else
                                 {
                                     LoginNlogLogger.Info("Migrazione completata!");
-                                    return Ok(); // (F)
+
+                                    // email e password corrette --> genero token e lo includo nel return come overload di Ok()
+                                    var token = GenerateJwtToken(credentials.Username);
+
+                                    LoginNlogLogger.Info("Generate Jwt Token  (email trovata nel vecchio db)");
+
+                                    return Ok(new {token}); // (F)
                                 }
                             }
                             else
@@ -175,7 +189,13 @@ namespace BetaCycle_Padova.Controllers
                         if (VerifyPassword(credentials.Password, passwordInDBSalt, passwordInDBHash))
                         {
                             LoginNlogLogger.Info("Credenziali corrette");
-                            return Ok(); // (C)
+
+                            // email e password corrette --> genero token e lo includo nel return come overload di Ok()
+                            var token = GenerateJwtToken(credentials.Username);
+
+                            LoginNlogLogger.Info("Generate Jwt Token (email trovata nel nuovo db)");
+
+                            return Ok(new { token }); // (C)
                         }
                         else
                         {
@@ -294,6 +314,37 @@ namespace BetaCycle_Padova.Controllers
             return enteredPasswordEncrypted.Equals(encryptedPassword);
         }
         #endregion 
+
+
+        #region metodo x generare il token Jwt
+        private string GenerateJwtToken(string username)
+        {
+            // inserire in un try-catch e stampare Info/Error in LogTrace?
+            var secretKey = _jwtSettings.SecretKey;
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(secretKey); //qnd in program.cs arriva token si farà confronto tra qll che ho passato x generare token e qll che autenticazione si aspetta di trovare in token per dare l'ok
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                //parametri che esistono grazie a SecurityTokenDescriptor = subject, issuer etc
+                Subject = new ClaimsIdentity(new[] //stiamo costruendo info fondamentali che andranno salvate nel token
+                {
+                    new Claim(ClaimTypes.Name, username)
+                }),
+                Expires = DateTime.Now.AddMinutes(_jwtSettings.ExpirationMinutes),
+                Issuer = _jwtSettings.Issuer,
+                Audience = _jwtSettings.Audience,
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            string tokenString = tokenHandler.WriteToken(token);
+
+            return tokenString;
+        }
+        #endregion
 
     }
 }
