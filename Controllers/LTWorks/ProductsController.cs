@@ -24,8 +24,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [BasicAuthorizationAttributes]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[BasicAuthorizationAttributes]
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -10,7 +11,7 @@ using WebAca5CodeFirst.Models;
 
 namespace CodeFirst.BLogic.Authentication.Jwt
 {
-    public class JwtAuthenticationHandler : AuthenticationHandler<JwtBearerOptions>
+    public class JwtBearerHandler : AuthenticationHandler<JwtBearerOptions>
     //public class JwtAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         //private readonly OldCustomersController _customersController;
@@ -20,7 +21,9 @@ namespace CodeFirst.BLogic.Authentication.Jwt
 
         private readonly JwtSettings _jwtSettings; // Configurazione per la generazione dei token JWT
 
-        public JwtAuthenticationHandler(
+        private static Logger JwtNlogLogger = LogManager.GetCurrentClassLogger();
+
+        public JwtBearerHandler(
             IOptionsMonitor<JwtBearerOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder, TokenValidationParameters tokenValidationParameters,
@@ -31,23 +34,6 @@ namespace CodeFirst.BLogic.Authentication.Jwt
             _jwtSettings = jwtSettings.Value;
         }
 
-        //public JwtAuthenticationHandler(
-        //    //IOptionsMonitor<AuthenticationSchemeOptions> options,
-        //    ILoggerFactory logger,
-        //    UrlEncoder encoder,
-        //    //OldCustomersController customersController,
-        //    //UsersController usersController,
-        //    TokenValidationParameters tokenValidationParameters,
-        //    IOptions<Jwtsettings> jwtSettings) :
-        //    base(options, logger, encoder)
-        //{
-
-        //    //_customersController = customersController;
-        //    //_usersController = usersController;
-        //    _tokenValidationParameters = tokenValidationParameters;
-        //    _jwtSettings = jwtSettings.Value;
-        //}
-
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             if (!Request.Headers.ContainsKey("Authorization"))
@@ -56,6 +42,7 @@ namespace CodeFirst.BLogic.Authentication.Jwt
             }
 
             var authorizationHeader = Request.Headers["Authorization"].ToString();
+
             if (!authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 return AuthenticateResult.Fail("Invalid Authorization header");
@@ -63,7 +50,7 @@ namespace CodeFirst.BLogic.Authentication.Jwt
 
             var token = authorizationHeader.Substring("Bearer ".Length).Trim();
 
-            //fino a qui controlla le autorizzazioni
+            JwtNlogLogger.Info("Jwt Authentication Handler - Controllo Autorizzazioni");
 
             try
             {
@@ -75,27 +62,19 @@ namespace CodeFirst.BLogic.Authentication.Jwt
 
                 var email = jwtToken.Claims.First(x => x.Type == ClaimTypes.Email).Value;
 
-                //NON CONTROLLIAMO LA PASSWORD PER IL MOMENTO - ASSUMIAMO CHE IL TOKEN GENERATO APPARTENGA ALL'USER EFFETTIVO
-
-                // Controlla se l'email è presente nel database degli utenti
-                //var customerResult = await _customersController.GetCustomerByEmail(email);
-
-
-                //if (customerResult == null)
-                //{
-                //    return AuthenticateResult.Fail("User not found");
-                //}
-
+                // non facciamo controlli di email nel db, assumiamo che sia sufficiente aver passato tutti i controlli precedenti sulle autorizzazioni
 
                 var claims = new[] { new Claim(ClaimTypes.Email, email) };
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, Scheme.Name);
-
+                
+                JwtNlogLogger.Info("Jwt Authentication Handler ha autenticato il Token fornito");
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)
             {
+                JwtNlogLogger.Error(ex, "Jwt Authentication Handler ha sollevato un'Eccezione");
                 return AuthenticateResult.Fail("Invalid token");
             }
         }
