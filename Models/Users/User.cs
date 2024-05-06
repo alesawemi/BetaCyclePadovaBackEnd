@@ -38,4 +38,20 @@ public partial class User
         OldCustomerId = oldCust;
         Credential = credential;
     }
+    /// <summary>
+    /// User parametrized
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="surname"></param>
+    /// <param name="phone"></param>
+    /// <param name="mail"></param>
+    /// <param name="credential"></param>
+    public User(string name, string surname, string phone, string mail, Credential credential)
+    {
+        Name = name;
+        Surname = surname;
+        Phone = phone;
+        Mail = mail;     
+        Credential = credential;
+    }
 }

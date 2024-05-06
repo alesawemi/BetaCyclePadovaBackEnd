@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.Users;
 using BetaCycle_Padova.Models.LTWorks;
+using System.Text;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace BetaCycle_Padova.Controllers.Users
 {
@@ -113,6 +116,74 @@ namespace BetaCycle_Padova.Controllers.Users
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
+
+        
+        // POST: api/Users/Registration
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("Registration")]
+        public async Task<ActionResult<User>> PostRegistration(RegisterUser rUser)
+        {
+            string pass = Encoding.UTF8.GetString(Convert.FromBase64String(rUser.Password)); //password in chiaro
+
+            Console.WriteLine("Password in chiaro: "+pass);
+            byte[] salt = new byte[32];
+            RandomNumberGenerator.Fill(salt);
+
+            string passHash = Convert.ToBase64String(
+                                    KeyDerivation.Pbkdf2(
+                                    password: pass,
+                                    salt: salt,
+                                    prf: KeyDerivationPrf.HMACSHA256,
+                                    iterationCount: 100000, // Modificare se necessario
+                                    numBytesRequested: 16));
+            string passSalt = Convert.ToBase64String(salt);
+
+            Console.WriteLine("PassHash: "+passHash);
+            Console.WriteLine("PassSalt: " + passSalt);
+
+            Credential newCredential = new Credential
+            { 
+                Password = passHash,
+                Salt = passSalt
+            };
+
+            Console.WriteLine("Credential: " + newCredential.Password + " - " + newCredential.Salt);
+
+            Console.WriteLine("RegistrationUser: " + rUser.Mail + " - " + rUser.Name + " - " + rUser.Surname + " - " + rUser.Phone);
+
+            User user = new User
+            {
+                Name = rUser.Name,
+                Surname = rUser.Surname,
+                Phone = rUser.Phone,
+                Mail = rUser.Mail,
+                Credential = newCredential
+            };
+       
+            _context.Users.Add(user);
+            try
+            {
+                Console.WriteLine("Entro nel try");
+
+                await _context.SaveChangesAsync();
+
+                Console.WriteLine("Ho Finito nel try");
+            }
+            catch (DbUpdateException dbex)
+            {
+                if (UserExists(user.Id))
+                {
+                    Console.WriteLine("CONFLICT");
+                    return Conflict(); //CAPIRE COSA TI RESTITUISCE
+                }
+                else
+                {
+                    Console.WriteLine("PROBLEMA NEL POST REGISTRA USER: " + dbex.Message);
+                }
+            }
+
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        }
 
 
 
