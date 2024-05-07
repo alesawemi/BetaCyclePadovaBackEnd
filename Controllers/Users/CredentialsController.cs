@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.Users;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.Users
 {
@@ -20,6 +21,8 @@ namespace BetaCycle_Padova.Controllers.Users
         {
             _context = context;
         }
+
+        private static Logger CredentialNlogLogger = LogManager.GetCurrentClassLogger();
 
         // GET: api/Credentials
         [HttpGet]
@@ -50,9 +53,11 @@ namespace BetaCycle_Padova.Controllers.Users
 
             if (credentials == null)
             {
+                CredentialNlogLogger.Info("CredentialController - GetCredentialByUserId - NotFound");
                 return NotFound();
             }
-
+            
+            CredentialNlogLogger.Info("CredentialController - GetCredentialByUserId - Ok");
             return credentials;
         }
 

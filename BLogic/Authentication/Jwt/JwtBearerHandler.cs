@@ -38,6 +38,7 @@ namespace CodeFirst.BLogic.Authentication.Jwt
         {
             if (!Request.Headers.ContainsKey("Authorization"))
             {
+                JwtNlogLogger.Warn("Jwt Bearer Handler - Missing Authorization header");
                 return AuthenticateResult.Fail("Missing Authorization header");
             }
 
@@ -45,12 +46,13 @@ namespace CodeFirst.BLogic.Authentication.Jwt
 
             if (!authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
+                JwtNlogLogger.Warn("Jwt Bearer Handler - Invalid Authorization header");
                 return AuthenticateResult.Fail("Invalid Authorization header");
             }
 
             var token = authorizationHeader.Substring("Bearer ".Length).Trim();
 
-            JwtNlogLogger.Info("Jwt Authentication Handler - Controllo Autorizzazioni");
+            JwtNlogLogger.Info("Jwt Bearer Handler - Controllo Autorizzazioni");
 
             try
             {
@@ -69,7 +71,7 @@ namespace CodeFirst.BLogic.Authentication.Jwt
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, Scheme.Name);
                 
-                JwtNlogLogger.Info("Jwt Authentication Handler ha autenticato il Token fornito");
+                JwtNlogLogger.Info("Jwt Bearer Handler ha autenticato il Token fornito");
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.LTWorks;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks
 {
@@ -20,6 +21,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         {
             _context = context;
         }
+
+        private static Logger CustomerNlogLogger = LogManager.GetCurrentClassLogger();
 
         // GET: api/OldCustomers
         [HttpGet]
@@ -50,9 +53,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             if (customer == null)
             {
+                CustomerNlogLogger.Info("OldCustomerController - GetCustomerByEmail - NotFound");
                 return NotFound();
             }
 
+            CustomerNlogLogger.Info("OldCustomerController - GetCustomerByEmail - Ok");
             return customer;
         }
 

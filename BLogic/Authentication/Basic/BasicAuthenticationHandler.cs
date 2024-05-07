@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using NLog;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -18,6 +19,8 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
         {
         }
 
+        private static Logger BasicNlogLogger = LogManager.GetCurrentClassLogger();
+
         //Questo è il motore che ci permette di fare l'autenticazione basica.
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -27,8 +30,9 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
 
             //Dall'intestazione che hai nella chiamata cercami un "Authorization"
             if (!Request.Headers.ContainsKey("Authorization")) //--DA RISOLVERE IN FUTURO
-            {              
-               return Task.FromResult(AuthenticateResult.Fail("Missing Authorization"));//se non ti trovo - esci fuori subito
+            {
+                BasicNlogLogger.Warn("Basic Authentication Handler - Missing Authorization");
+                return Task.FromResult(AuthenticateResult.Fail("Missing Authorization"));//se non ti trovo - esci fuori subito
                                                                                         
             } //else vai avanti
 
@@ -38,6 +42,7 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
 
             if (!authorHeaderRegEx.IsMatch(authorizationHeader)) //se la regex non corrisponde con quanto trovato
             {
+                BasicNlogLogger.Warn("Basic Authentication Handler - Invalid Authorization");
                 return Task.FromResult(AuthenticateResult.Fail("Invalid Authorization")); //esce fuori
             }
 
@@ -57,6 +62,7 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
             //Se va tutto bene ho username e password - qui inizia il lavoro dietro le quinte da implementare
             if ((string.IsNullOrEmpty(authUser)) || (string.IsNullOrEmpty(authPassword.Trim()))) //Trim butta via gli spazi non significativi
             {
+                BasicNlogLogger.Warn("Basic Authentication Handler - Username e/o Password NON validi");
                 return Task.FromResult(AuthenticateResult.Fail("Username e/o Password NON validi"));
             }
             else
@@ -67,6 +73,7 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
                 //framework definisce entità che permetterà all'utente di entrare
                 var claimsMain = new ClaimsPrincipal(new ClaimsIdentity(authenticatedUser));
 
+                BasicNlogLogger.Info("Basic Authentication Handler ha autorizzato l'operazione");
                 return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(claimsMain, Scheme.Name)));
 
             }           

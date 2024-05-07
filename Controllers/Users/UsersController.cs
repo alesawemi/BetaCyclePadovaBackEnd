@@ -12,6 +12,7 @@ using System.Text;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Net;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.Users
 {
@@ -25,6 +26,8 @@ namespace BetaCycle_Padova.Controllers.Users
         {
             _context = context;
         }
+
+        private static Logger UserNlogLogger = LogManager.GetCurrentClassLogger();
 
         // GET: api/Users
         [HttpGet]
@@ -55,9 +58,11 @@ namespace BetaCycle_Padova.Controllers.Users
 
             if (user == null)
             {
+                UserNlogLogger.Info("UserController - GetUserByEmail - NotFound");
                 return NotFound();
             }
 
+            UserNlogLogger.Info("UserController - GetUserByEmail - Ok");
             return user;
         }
 
@@ -105,12 +110,15 @@ namespace BetaCycle_Padova.Controllers.Users
             catch (DbUpdateException dbex)
             {
                 if (UserExists(user.Id))
-                {                    
+                {
+                    UserNlogLogger.Error(dbex, "UserController - PostUser - UserExists, Conflict");
                     return Conflict(); //CAPIRE COSA TI RESTITUISCE
                 }
                 else
                 {
                     Console.WriteLine("PROBLEMA NEL POST USER: " + dbex.Message);
+                    UserNlogLogger.Error(dbex, "UserController - PostUser - BadRequest");
+                    return BadRequest(dbex);
                 }
             }
 
@@ -124,10 +132,10 @@ namespace BetaCycle_Padova.Controllers.Users
         [HttpPost("Registration")]
         public async Task<ActionResult<User>> PostRegistration(RegisterUser rUser)
         {
-            Console.WriteLine("RegistrationUser: " + rUser.FirstName + " - " + rUser.LastName + " - " + rUser.Phone + " - " + rUser.EmailAddress);
+            //Console.WriteLine("RegistrationUser: " + rUser.FirstName + " - " + rUser.LastName + " - " + rUser.Phone + " - " + rUser.EmailAddress);
             string pass = Encoding.UTF8.GetString(Convert.FromBase64String(rUser.Password)); //password in chiaro
 
-            Console.WriteLine("Password in chiaro: "+pass);
+            //Console.WriteLine("Password in chiaro: "+pass);
             byte[] salt = new byte[32];
             RandomNumberGenerator.Fill(salt);
 
@@ -140,8 +148,8 @@ namespace BetaCycle_Padova.Controllers.Users
                                     numBytesRequested: 16));
             string passSalt = Convert.ToBase64String(salt);
 
-            Console.WriteLine("PassHash: "+passHash);
-            Console.WriteLine("PassSalt: " + passSalt);
+            //Console.WriteLine("PassHash: "+passHash);
+            //Console.WriteLine("PassSalt: " + passSalt);
 
             Credential newCredential = new Credential
             { 
@@ -149,7 +157,7 @@ namespace BetaCycle_Padova.Controllers.Users
                 Salt = passSalt
             };
 
-            Console.WriteLine("Credential: " + newCredential.Password + " - " + newCredential.Salt);
+            //Console.WriteLine("Credential: " + newCredential.Password + " - " + newCredential.Salt);
 
 
             User user = new User
@@ -164,32 +172,24 @@ namespace BetaCycle_Padova.Controllers.Users
             _context.Users.Add(user);
             try
             {
-                Console.WriteLine("Entro nel try");
-
                 await _context.SaveChangesAsync();
-
-                Console.WriteLine("Ho Finito nel try");
+                UserNlogLogger.Info("UserController - PostRegistration - Ok");
                 return Ok(new { status = HttpStatusCode.OK });
             }
             catch (DbUpdateException dbex)
             {
                 if (UserExists(user.Mail))
                 {
-                    Console.WriteLine("CONFLICT");
+                    UserNlogLogger.Error(dbex, "UserController - PostRegistration - EmailExists - Conflict");
                     return Conflict(); //RESTITUISCE UN 409    new { status = HttpStatusCode.Conflict }
                 }
                 else
                 {
-                    Console.WriteLine("PROBLEMA NEL POST REGISTRA USER: " + dbex.Message);
+                    UserNlogLogger.Error(dbex, "UserController - PostRegistration - InternalError");
                     return StatusCode(500, new { status = HttpStatusCode.InternalServerError }); // Gestisci altri casi di errore e restituisci il codice di stato appropriato
                 }
             }
-        }
-
-        private bool UserExists(string email)
-        {
-            return _context.Users.Any(e => e.Mail == email);
-        }
+        }        
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
@@ -210,6 +210,11 @@ namespace BetaCycle_Padova.Controllers.Users
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);
+        }
+
+        private bool UserExists(string email)
+        {
+            return _context.Users.Any(e => e.Mail == email);
         }
     }
 }

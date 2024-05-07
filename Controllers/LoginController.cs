@@ -71,7 +71,7 @@ namespace BetaCycle_Padova.Controllers
             //E' giusto che l'admin o il tecnico possa intervenire capendo il tipo di errore
             //Intercettare anche accessi abusivi ? 
 
-            LoginNlogLogger.Info("Received login request.");            
+            LoginNlogLogger.Info("LoginController - Received login request.");            
 
             try
             {
@@ -90,7 +90,7 @@ namespace BetaCycle_Padova.Controllers
                         #region email NON è nel vecchio db --> registrazione
                         if (foundCustomer.Result.Value == null)
                         {
-                            LoginNlogLogger.Error("L'utente non è ancora registrato - reindirizzamento alla page Registrati.");
+                            LoginNlogLogger.Error("Login Controller - L'utente non è ancora registrato - reindirizzamento alla page Registrati.");
                             return NotFound(); // (H) //frontend che intercetta questo NotFound deve reindirizzare utente alla pag di registrazione
                         }
                         #endregion
@@ -105,8 +105,8 @@ namespace BetaCycle_Padova.Controllers
 
                             if (VerifyPassword(credentials.Password, passwordInDBSalt, passwordInDBHash))
                             {
-                                LoginNlogLogger.Info("User esiste nel vecchio db - Password OK - Migrazione in corso");
-                                #region migrazione !! gestire eventuali errori 
+                                LoginNlogLogger.Info("LoginController - Customer esiste nel vecchio db - Password OK - Migrazione in corso");
+                                #region migrazione
                                 // (G) se è tutto ok fai migrazione a nuovo db
                                 Models.Users.Credential newCredential = new Models.Users.Credential
                                     (
@@ -133,9 +133,9 @@ namespace BetaCycle_Padova.Controllers
                                 // http post nello User Controller ritorna un CreatedAtAction quando la migrazione ha successo
                                 // ed è difficile accedere alle proprietà di questo tipo per fare qui un controllo sul risultato della migrazione
 
-                                if (migrateUser.Result == null)
+                                if (migrateUser.Result == BadRequest())
                                 {
-                                    LoginNlogLogger.Error("Problema con la Migrazione!");
+                                    LoginNlogLogger.Error("Login Controller - Problema con la Migrazione!");
                                     return BadRequest(new { message = "Problema con la Migrazione!" }); // (F) 
                                     // per ora lasciamo questo messaggio di errore per noi per capire se c'è un problema con la migrazione
                                     // ma poi andrà tolto/cambiato, cosa se ne fa utente di questa info?
@@ -146,19 +146,19 @@ namespace BetaCycle_Padova.Controllers
 
                                 else
                                 {
-                                    LoginNlogLogger.Info("Migrazione completata!");
+                                    LoginNlogLogger.Info("LoginController - Migrazione completata!");
 
                                     // email e password corrette --> genero token e lo includo nel return come overload di Ok()
                                     var token = GenerateJwtToken(credentials.Username);
 
-                                    LoginNlogLogger.Info("Generate Jwt Token  (email trovata nel vecchio db)");
+                                    LoginNlogLogger.Info("LoginController - Generate Jwt Token  (vecchio db)");
 
                                     return Ok(new {token}); // (F)
                                 }
                             }
                             else
                             {
-                                LoginNlogLogger.Error("Credenziali Non Corrette");
+                                LoginNlogLogger.Error("LoginController - Credenziali Non Corrette (vecchio db)");
                                 return BadRequest(new { message = "Credenziali Non Corrette" }); // (F)
                             }
                             #endregion
@@ -170,7 +170,7 @@ namespace BetaCycle_Padova.Controllers
                     #region email è nel nuovo db --> controllo psw e invio risposta al frontend : LoginOk/Credenziali Non Corrette 
                     else
                     {
-                        LoginNlogLogger.Info("User trovato nel nuovo database --> controllo password");
+                        LoginNlogLogger.Info("LoginController - User trovato nel nuovo database --> controllo password");
                         // (B) se email trovata nel "nuovo" database --> controllo password
 
                         // get User by Email non riempe anche il campo Credential di user --> serve get dalla tab Credentials
@@ -179,7 +179,7 @@ namespace BetaCycle_Padova.Controllers
 
                         if (foundCredentials.Result.Value == null)
                         {
-                            LoginNlogLogger.Fatal("Fatal Error");
+                            LoginNlogLogger.Fatal("LoginController - Fatal Error: nel nuovo db c'è email in User ma non ci sono Credential corrispondenti");
                             return BadRequest(new { message = "Fatal Error" }); // ha trovato email nel nuovo db ma non c'è password associata
                         }
 
@@ -188,18 +188,18 @@ namespace BetaCycle_Padova.Controllers
 
                         if (VerifyPassword(credentials.Password, passwordInDBSalt, passwordInDBHash))
                         {
-                            LoginNlogLogger.Info("Credenziali corrette");
+                            LoginNlogLogger.Info("LoginController - Credenziali corrette (nuovo db)");
 
                             // email e password corrette --> genero token e lo includo nel return come overload di Ok()
                             var token = GenerateJwtToken(credentials.Username);
 
-                            LoginNlogLogger.Info("Generate Jwt Token (email trovata nel nuovo db)");
+                            LoginNlogLogger.Info("LoginController - Generate Jwt Token (nuovo db)");
 
                             return Ok(new { token }); // (C)
                         }
                         else
                         {
-                            LoginNlogLogger.Error("Credenziali Non Corrette");
+                            LoginNlogLogger.Error("LoginController - Credenziali Non Corrette(nuovo db)");
                             return BadRequest(new { message = "Credenziali Non Corrette" }); // (C)
                         }
                     }
@@ -208,16 +208,16 @@ namespace BetaCycle_Padova.Controllers
                 }
                 else
                 {                   
-                    LoginNlogLogger.Error("Credenziali Non Fornite");
+                    LoginNlogLogger.Error("LoginController - Credenziali Non Fornite");
                     return BadRequest(new { message = "Credenziali Non Fornite" });
                 }
             }
             catch (Exception ex)
             {
-                LoginNlogLogger.Error(ex, " - Il Login ha sollevato un'eccezione nel catch");           
+                LoginNlogLogger.Error(ex, "LoginController ha sollevato un'eccezione nel catch");           
             }
 
-            LoginNlogLogger.Error("Errore Grave nel Login.");            
+            LoginNlogLogger.Error("LoginController - Errore Grave nel Login.");            
             return BadRequest();
         }
 
@@ -234,7 +234,7 @@ namespace BetaCycle_Padova.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoginNlogLogger.Error(ex, "LoginController - FindCredentialNew");
             }
 
             return BadRequest();
@@ -254,7 +254,7 @@ namespace BetaCycle_Padova.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoginNlogLogger.Error(ex, "LoginController - FindEmailNew");
             }
 
             return BadRequest();
@@ -274,7 +274,7 @@ namespace BetaCycle_Padova.Controllers
             } 
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoginNlogLogger.Error(ex, "LoginController - FindEmailOld");
             }
 
             return BadRequest();    
@@ -284,34 +284,41 @@ namespace BetaCycle_Padova.Controllers
         #region metodo x verifica della password 
         private bool VerifyPassword(string password, string saltEncrypt, string encryptedPassword)
         {                               // clear psw, salt nel db, psw nel db
-            // Converti il salt da stringa a un array di byte
-            byte[] salt = Convert.FromBase64String(saltEncrypt);
+            try
+            {
+                // Converti il salt da stringa a un array di byte
+                byte[] salt = Convert.FromBase64String(saltEncrypt);
+                
+                //Console.WriteLine("Salt recuperato durante il verify:");
+                //Console.WriteLine(BitConverter.ToString(salt)); // Stampa il salt in formato esadecimale
+                
+                // Calcola la password criptata utilizzando la password inserita e lo stesso salt
+                string enteredPasswordEncrypted = Convert.ToBase64String(
+                    KeyDerivation.Pbkdf2(
+                        password: password,
+                        salt: salt,
+                        prf: KeyDerivationPrf.HMACSHA256,
 
-            //Console.WriteLine("Salt recuperato durante il verify:");
-            //Console.WriteLine(BitConverter.ToString(salt)); // Stampa il salt in formato esadecimale
+                        ////Encrypt di Nicholas
+                        //iterationCount: 10000, // Modificare se necessario
+                        //numBytesRequested: 32)); // Lunghezza della password criptata
 
+                        //Encrypt di Marti
+                        iterationCount: 100000,
+                        numBytesRequested: 16));
 
+                        Console.WriteLine("La psw inserita criptata con il salt preso dal DB è: " + enteredPasswordEncrypted);
+                        Console.WriteLine("La psw criptata contenuta nel DB è: " + encryptedPassword);
 
-            // Calcola la password criptata utilizzando la password inserita e lo stesso salt
-            string enteredPasswordEncrypted = Convert.ToBase64String(
-                KeyDerivation.Pbkdf2(
-                    password: password,
-                    salt: salt,
-                    prf: KeyDerivationPrf.HMACSHA256,
-
-            ////Encrypt di Nicholas
-            //iterationCount: 10000, // Modificare se necessario
-            //numBytesRequested: 32)); // Lunghezza della password criptata
-
-            //Encrypt di Marti
-            iterationCount: 100000,
-            numBytesRequested: 16));
-
-            Console.WriteLine("La psw inserita criptata con il salt preso dal DB è: " + enteredPasswordEncrypted);
-            Console.WriteLine("La psw criptata contenuta nel DB è: " + encryptedPassword);
-
-            // Confronta la password criptata appena calcolata con quella memorizzata
-            return enteredPasswordEncrypted.Equals(encryptedPassword);
+                        // Confronta la password criptata appena calcolata con quella memorizzata
+                        return enteredPasswordEncrypted.Equals(encryptedPassword);
+            }
+            catch (Exception ex)
+            {
+                LoginNlogLogger.Error(ex, "LoginController - VerifyPassword");
+                return false;
+            }           
+            
         }
         #endregion 
 
@@ -319,30 +326,37 @@ namespace BetaCycle_Padova.Controllers
         #region metodo x generare il token Jwt
         private string GenerateJwtToken(string username)
         {
-            // inserire in un try-catch e stampare Info/Error in LogTrace?
-            var secretKey = _jwtSettings.SecretKey;
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(secretKey); //qnd in program.cs arriva token si farà confronto tra qll che ho passato x generare token e qll che autenticazione si aspetta di trovare in token per dare l'ok
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                //parametri che esistono grazie a SecurityTokenDescriptor = subject, issuer etc
-                Subject = new ClaimsIdentity(new[] //stiamo costruendo info fondamentali che andranno salvate nel token
+                var secretKey = _jwtSettings.SecretKey;
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(secretKey); //qnd in program.cs arriva token si farà confronto tra qll che ho passato x generare token e qll che autenticazione si aspetta di trovare in token per dare l'ok
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    new Claim(ClaimTypes.Name, username)
-                }),
-                Expires = DateTime.Now.AddMinutes(_jwtSettings.ExpirationMinutes),
-                Issuer = _jwtSettings.Issuer,
-                Audience = _jwtSettings.Audience,
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
+                    //parametri che esistono grazie a SecurityTokenDescriptor = subject, issuer etc
+                    Subject = new ClaimsIdentity(new[] //stiamo costruendo info fondamentali che andranno salvate nel token
+                    {
+                        new Claim(ClaimTypes.Name, username)
+                    }),
+                    Expires = DateTime.Now.AddMinutes(_jwtSettings.ExpirationMinutes),
+                    Issuer = _jwtSettings.Issuer,
+                    Audience = _jwtSettings.Audience,
+                    SigningCredentials = new SigningCredentials(
+                        new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature)
+                };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+                var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            string tokenString = tokenHandler.WriteToken(token);
+                string tokenString = tokenHandler.WriteToken(token);
 
-            return tokenString;
+                return tokenString;
+            }
+            catch (Exception ex)
+            {
+                LoginNlogLogger.Error(ex, "LoginController - GenerateJwtToken");
+                return "ERROR";
+            }            
         }
         #endregion
 
