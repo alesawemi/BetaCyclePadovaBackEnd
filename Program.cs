@@ -109,6 +109,14 @@ namespace BetaCycle_Padova
             });
             #endregion
 
+
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                });
+
+
             ////////////Prova gestione errori///////////////////////////
             #region  NLog per gestire gli eventi / errori
             //LoggerNLog loggerNLog = new();
@@ -131,6 +139,7 @@ namespace BetaCycle_Padova
 
             app.UseAuthentication();
             app.UseAuthorization();
+
 
 
             app.MapControllers();

@@ -123,6 +123,7 @@ namespace BetaCycle_Padova.Controllers.Users
         [HttpPost("Registration")]
         public async Task<ActionResult<User>> PostRegistration(RegisterUser rUser)
         {
+            Console.WriteLine("RegistrationUser: " + rUser.FirstName + " - " + rUser.LastName + " - " + rUser.Phone + " - " + rUser.EmailAddress);
             string pass = Encoding.UTF8.GetString(Convert.FromBase64String(rUser.Password)); //password in chiaro
 
             Console.WriteLine("Password in chiaro: "+pass);
@@ -149,16 +150,15 @@ namespace BetaCycle_Padova.Controllers.Users
 
             Console.WriteLine("Credential: " + newCredential.Password + " - " + newCredential.Salt);
 
-            Console.WriteLine("RegistrationUser: " + rUser.Mail + " - " + rUser.Name + " - " + rUser.Surname + " - " + rUser.Phone);
 
             User user = new User
             {
-                Name = rUser.Name,
-                Surname = rUser.Surname,
+                Name = rUser.FirstName,
+                Surname = rUser.LastName,
                 Phone = rUser.Phone,
-                Mail = rUser.Mail,
-                Credential = newCredential
+                Mail = rUser.EmailAddress,                
             };
+            user.Credential = newCredential;
        
             _context.Users.Add(user);
             try
