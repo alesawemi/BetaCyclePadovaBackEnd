@@ -11,6 +11,7 @@ using BetaCycle_Padova.Models.LTWorks;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Net;
 
 namespace BetaCycle_Padova.Controllers.Users
 {
@@ -168,24 +169,27 @@ namespace BetaCycle_Padova.Controllers.Users
                 await _context.SaveChangesAsync();
 
                 Console.WriteLine("Ho Finito nel try");
+                return Ok(new { status = HttpStatusCode.OK });
             }
             catch (DbUpdateException dbex)
             {
-                if (UserExists(user.Id))
+                if (UserExists(user.Mail))
                 {
                     Console.WriteLine("CONFLICT");
-                    return Conflict(); //CAPIRE COSA TI RESTITUISCE
+                    return Conflict(); //RESTITUISCE UN 409    new { status = HttpStatusCode.Conflict }
                 }
                 else
                 {
                     Console.WriteLine("PROBLEMA NEL POST REGISTRA USER: " + dbex.Message);
+                    return StatusCode(500, new { status = HttpStatusCode.InternalServerError }); // Gestisci altri casi di errore e restituisci il codice di stato appropriato
                 }
             }
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-
+        private bool UserExists(string email)
+        {
+            return _context.Users.Any(e => e.Mail == email);
+        }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
