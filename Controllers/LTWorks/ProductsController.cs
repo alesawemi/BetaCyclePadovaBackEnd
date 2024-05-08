@@ -24,7 +24,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         //[BasicAuthorizationAttributes]
         // GET: api/Products
         [HttpGet]

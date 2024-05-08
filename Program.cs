@@ -2,7 +2,6 @@ using BetaCycle_Padova.BLogic.Authentication.Basic;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Controllers.LTWorks;
 using BetaCycle_Padova.Controllers.Users;
-using BetaCycle_Padova.Log;
 using BetaCycle_Padova.Models.Mongo;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
