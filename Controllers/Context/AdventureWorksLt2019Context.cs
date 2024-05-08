@@ -16,17 +16,27 @@ public partial class AdventureWorksLt2019Context : DbContext
     {
     }
 
+    public virtual DbSet<AccessoriesView> AccessoriesViews { get; set; }
+
     public virtual DbSet<Address> Addresses { get; set; }
 
+    public virtual DbSet<BikesView> BikesViews { get; set; }
+
     public virtual DbSet<BuildVersion> BuildVersions { get; set; }
+
+    public virtual DbSet<ClothingView> ClothingViews { get; set; }
+
+    public virtual DbSet<ComponentsView> ComponentsViews { get; set; }
 
     public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<CustomerAddress> CustomerAddresses { get; set; }
 
-    public virtual DbSet<ErrorLog> ErrorLogs { get; set; }
+    public virtual DbSet<ErrorLogDonotuse> ErrorLogDonotuses { get; set; }
 
     public virtual DbSet<LogError> LogErrors { get; set; }
+
+    public virtual DbSet<LogTrace> LogTraces { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
 
@@ -55,6 +65,23 @@ public partial class AdventureWorksLt2019Context : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
+        modelBuilder.Entity<AccessoriesView>(entity =>
+        {
+            entity
+                .HasKey(av => av.ProductId); // Specifica ProductId come chiave primaria, anche se è una vista
+            entity.ToView("AccessoriesView", "SalesLT");
+
+            entity.Property(e => e.Color).HasMaxLength(15);
+            entity.Property(e => e.ListPrice).HasColumnType("money");
+            entity.Property(e => e.ProductCategory).HasMaxLength(50);
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
+            entity.Property(e => e.ProductName).HasMaxLength(50);
+            entity.Property(e => e.Size).HasMaxLength(5);
+            entity.Property(e => e.StandardCost).HasColumnType("money");
+            entity.Property(e => e.Weight).HasColumnType("decimal(8, 2)");
+        });
+
 
         modelBuilder.Entity<Address>(entity =>
         {
@@ -97,6 +124,22 @@ public partial class AdventureWorksLt2019Context : DbContext
                 .HasComment("Name of state or province.");
         });
 
+        modelBuilder.Entity<BikesView>(entity =>
+        {
+            entity
+                .HasKey(av => av.ProductId); // Specifica ProductId come chiave primaria, anche se è una vista
+            entity.ToView("BikesView", "SalesLT");
+
+            entity.Property(e => e.Color).HasMaxLength(15);
+            entity.Property(e => e.ListPrice).HasColumnType("money");
+            entity.Property(e => e.ProductCategory).HasMaxLength(50);
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
+            entity.Property(e => e.ProductName).HasMaxLength(50);
+            entity.Property(e => e.Size).HasMaxLength(5);
+            entity.Property(e => e.StandardCost).HasColumnType("money");
+            entity.Property(e => e.Weight).HasColumnType("decimal(8, 2)");
+        });
+
         modelBuilder.Entity<BuildVersion>(entity =>
         {
             entity
@@ -118,6 +161,38 @@ public partial class AdventureWorksLt2019Context : DbContext
             entity.Property(e => e.VersionDate)
                 .HasComment("Date and time the record was last updated.")
                 .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<ClothingView>(entity =>
+        {
+            entity
+                .HasKey(av => av.ProductId); // Specifica ProductId come chiave primaria, anche se è una vista
+            entity.ToView("ClothingView", "SalesLT");
+
+            entity.Property(e => e.Color).HasMaxLength(15);
+            entity.Property(e => e.ListPrice).HasColumnType("money");
+            entity.Property(e => e.ProductCategory).HasMaxLength(50);
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
+            entity.Property(e => e.ProductName).HasMaxLength(50);
+            entity.Property(e => e.Size).HasMaxLength(5);
+            entity.Property(e => e.StandardCost).HasColumnType("money");
+            entity.Property(e => e.Weight).HasColumnType("decimal(8, 2)");
+        });
+
+        modelBuilder.Entity<ComponentsView>(entity =>
+        {
+            entity
+                .HasKey(av => av.ProductId); // Specifica ProductId come chiave primaria, anche se è una vista
+            entity.ToView("ComponentsView", "SalesLT");
+
+            entity.Property(e => e.Color).HasMaxLength(15);
+            entity.Property(e => e.ListPrice).HasColumnType("money");
+            entity.Property(e => e.ProductCategory).HasMaxLength(50);
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
+            entity.Property(e => e.ProductName).HasMaxLength(50);
+            entity.Property(e => e.Size).HasMaxLength(5);
+            entity.Property(e => e.StandardCost).HasColumnType("money");
+            entity.Property(e => e.Weight).HasColumnType("decimal(8, 2)");
         });
 
         modelBuilder.Entity<Customer>(entity =>
@@ -158,7 +233,7 @@ public partial class AdventureWorksLt2019Context : DbContext
                 .IsUnicode(false)
                 .HasComment("Password for the e-mail account.");
             entity.Property(e => e.PasswordSalt)
-                .HasMaxLength(10)
+                .HasMaxLength(128)
                 .IsUnicode(false)
                 .HasComment("Random value concatenated with the password string before the password is hashed.");
             entity.Property(e => e.Phone)
@@ -214,11 +289,11 @@ public partial class AdventureWorksLt2019Context : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
-        modelBuilder.Entity<ErrorLog>(entity =>
+        modelBuilder.Entity<ErrorLogDonotuse>(entity =>
         {
             entity.HasKey(e => e.ErrorLogId).HasName("PK_ErrorLog_ErrorLogID");
 
-            entity.ToTable("ErrorLog", tb => tb.HasComment("Audit table tracking errors in the the AdventureWorks database that are caught by the CATCH block of a TRY...CATCH construct. Data is inserted by stored procedure dbo.uspLogError when it is executed from inside the CATCH block of a TRY...CATCH construct."));
+            entity.ToTable("ErrorLog_DONOTUSE", tb => tb.HasComment("Audit table tracking errors in the the AdventureWorks database that are caught by the CATCH block of a TRY...CATCH construct. Data is inserted by stored procedure dbo.uspLogError when it is executed from inside the CATCH block of a TRY...CATCH construct."));
 
             entity.Property(e => e.ErrorLogId)
                 .HasComment("Primary key for ErrorLog records.")
@@ -249,6 +324,37 @@ public partial class AdventureWorksLt2019Context : DbContext
             entity.Property(e => e.ErrorMessage)
                 .HasMaxLength(500)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<LogTrace>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("LogTrace");
+
+            entity.Property(e => e.Exception)
+                .HasMaxLength(1000)
+                .IsFixedLength()
+                .HasColumnName("exception");
+            entity.Property(e => e.Level)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("level");
+            entity.Property(e => e.Logged)
+                .HasColumnType("datetime")
+                .HasColumnName("logged");
+            entity.Property(e => e.Logger)
+                .HasMaxLength(100)
+                .IsFixedLength()
+                .HasColumnName("logger");
+            entity.Property(e => e.MachineName)
+                .HasMaxLength(100)
+                .IsFixedLength()
+                .HasColumnName("machineName");
+            entity.Property(e => e.Message)
+                .HasMaxLength(1000)
+                .IsFixedLength()
+                .HasColumnName("message");
         });
 
         modelBuilder.Entity<Product>(entity =>
