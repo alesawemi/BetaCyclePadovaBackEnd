@@ -33,6 +33,27 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return await _context.Products.ToListAsync();
         }
 
+        // [Route("GetProductsByPage/{rowsPage}")]
+        [Route("GetProductsByPage")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPage() //(int rowsPage) //rowsPage lo metto nell'app-settings, non lo passo io
+        {
+            //posso direttamente sulla classe/oggetto del context eseguire delle query
+            int lastId = 0;
+
+            int rowsPage = 12; //ti chiedo pacchetti da 12 alla volta, poi tu user restringi la ricerca - affino la ricerca.
+
+            var page = _context.Products.FromSql(
+                $"SELECT * FROM [AdventureWorksLT2019].[SalesLT].[Product]")
+                .OrderBy(ob =>  new { ob.Name, ob.StandardCost })
+                .Where(a => a.ProductId > lastId)
+                .Take(rowsPage)
+                .ToListAsync();
+
+            return await page;
+        }
+
+
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
