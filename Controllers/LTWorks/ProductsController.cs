@@ -45,7 +45,9 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             var page = _context.Products.FromSql(
                 $"SELECT * FROM [AdventureWorksLT2019].[SalesLT].[Product]")
-                .OrderBy(ob =>  new { ob.Name, ob.StandardCost })
+                .OrderBy(ob => ob.Name)
+                .ThenBy(ob => ob.StandardCost)
+                //.OrderBy(ob =>  new { ob.Name, ob.StandardCost })
                 .Where(a => a.ProductId > lastId)
                 .Take(rowsPage)
                 .ToListAsync();
