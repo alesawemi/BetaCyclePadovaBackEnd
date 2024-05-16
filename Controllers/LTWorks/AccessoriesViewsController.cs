@@ -159,6 +159,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
                 foreach ( var col in colors ) {
                     if (col.Option is not null) { availableOptions.availableColors.Add(col.Option); } 
+                    else { availableOptions.availableColors.Add("other"); }
                 }
                 #endregion
 
@@ -215,8 +216,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             if (Filters.productName != "allProducts") { query = query.Where(a => a.ProductName.Contains(Filters.productName)); }
 
             if (Filters.color != "color") {                
-                string[] colors = Filters.color.Split(":");                
-                query = query.Where(a => a.Color == colors[1]);                                                
+                string[] colors = Filters.color.Split(":");
+                Array.ForEach(colors, c => Console.WriteLine(c));
+                if (colors[1] == "other") { query = query.Where(a => a.Color == null); }
+                else { query = query.Where(a => a.Color == colors[1]); }                                              
             }
 
             if (Filters.size != "size") { query = query.Where(a => a.Size == Filters.size); }
@@ -230,7 +233,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             if (Filters.minWeight != 0) { query = query.Where(a => a.Weight > Filters.minWeight); }
 
-            if (Filters.maxPrice != 0) { query = query.Where(a => a.ListPrice < Filters.maxPrice); }
+            if (Filters.maxPrice != 0) { query = query.Where(a => a.ListPrice <= Filters.maxPrice); }
 
             if (Filters.minPrice != 0) { query = query.Where(a => a.ListPrice > Filters.minPrice); }            
 
