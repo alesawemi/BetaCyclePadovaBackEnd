@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BetaCycle_Padova.Models.LTWorks;
+using BetaCycle_Padova.Models.LTWorks.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace BetaCycle_Padova.Controllers.Context;
@@ -15,6 +16,11 @@ public partial class AdventureWorksLt2019Context : DbContext
         : base(options)
     {
     }
+
+    #region nuove mappature per recuperare info dal db
+    public DbSet<xProperty> avOptions { get; set; }
+    public DbSet<PriceAndWeightMapping> PriceAndWeightOptions { get; set; }
+    #endregion
 
     public virtual DbSet<AccessoriesView> AccessoriesViews { get; set; }
 

@@ -116,11 +116,15 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+
+
         private bool AccessoriesViewExists(int id)
         {
             return _context.AccessoriesViews.Any(e => e.ProductId == id);
         }
 
+  
+        
         // GET: api/AccessoriesViews/OrderByPriceAscending
         [HttpGet("OrderByPriceAscending")]
         public async Task<ActionResult<IEnumerable<AccessoriesView>>> GetAccessoriesViewsOrderByPriceAscending()
@@ -142,6 +146,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         }
 
 
+         
         [HttpGet("GetProductProperties")]
         public async Task<ActionResult<ProductProperties>> GetProductProperties()
         {
@@ -149,53 +154,49 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             try
             {
-                #region COLORS
-                var colors = await _context.AccessoriesViews
-                    .FromSqlRaw($"SELECT [Color]" +
-                        $"FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]" +
-                        $"GROUP BY [Color]")
-                    .Select(x =>  new xProperty (x.Color))
-                    .ToListAsync();
+                //#region COLORS
+                //var colors = await _context.AccessoriesViews
+                //    .FromSqlRaw($"SELECT [Color]" +
+                //        $"FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]" +
+                //        $"GROUP BY [Color]")
+                //    .Select(x => new xProperty(x.Color))
+                //    .ToListAsync();
 
-                foreach ( var col in colors ) {
-                    if (col.Option is not null) { availableOptions.availableColors.Add(col.Option); } 
-                    else { availableOptions.availableColors.Add("other"); }
-                }
-                #endregion
+                //foreach (var col in colors)
+                //{
+                //    if (col.Option is not null) { availableOptions.availableColors.Add(col.Option); }
+                //    else { availableOptions.availableColors.Add("other"); }
+                //}
+                //#endregion
 
-                #region CATEGORIES
-                var categories = await _context.AccessoriesViews
-                    .FromSqlRaw($"SELECT [ProductCategory]" +
-                        $"FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]" +
-                        $"GROUP BY [ProductCategory]")
-                    .Select(x => new xProperty(x.ProductCategory))
-                    .ToListAsync();
+                //#region CATEGORIES
+                //var categories = await _context.AccessoriesViews
+                //    .FromSqlRaw($"SELECT [ProductCategory]" +
+                //        $"FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]" +
+                //        $"GROUP BY [ProductCategory]")
+                //    .Select(x => new xProperty(x.ProductCategory))
+                //    .ToListAsync();
 
-                foreach (var cat in categories) { availableOptions.availableCategories.Add(cat.Option); }
+                //foreach (var cat in categories) { availableOptions.availableCategories.Add(cat.Option); }
+                //#endregion
 
-                #endregion
+                //#region PRICE
+                //var result = await _context.AccessoriesViews
+                //   .FromSql($"SELECT * FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]")
+                //   .ToListAsync();
 
-                #region PRICE
-                var result = await _context.AccessoriesViews
-                   .FromSql($"SELECT * FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]")
-                   .ToListAsync();
-
-                foreach (var r in result)
-                {
-                    if (r.ListPrice > availableOptions.priceMax) availableOptions.priceMax = r.ListPrice;
-                    if (r.ListPrice < availableOptions.priceMin) availableOptions.priceMin = r.ListPrice;
-                }
-                #endregion
-
+                //foreach (var r in result)
+                //{
+                //    if (r.ListPrice > availableOptions.priceMax) availableOptions.priceMax = r.ListPrice;
+                //    if (r.ListPrice < availableOptions.priceMin) availableOptions.priceMin = r.ListPrice;
+                //}
+                //#endregion
 
             }
-
-
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-            }
-            
+            }           
 
             return availableOptions;
         }
@@ -217,7 +218,6 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             if (Filters.color != "color") {                
                 string[] colors = Filters.color.Split(":");
-                Array.ForEach(colors, c => Console.WriteLine(c));
                 if (colors[1] == "other") { query = query.Where(a => a.Color == null); }
                 else { query = query.Where(a => a.Color == colors[1]); }                                              
             }
