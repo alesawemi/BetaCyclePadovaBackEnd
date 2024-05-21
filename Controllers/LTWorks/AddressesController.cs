@@ -73,6 +73,52 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        // PUT: api/Addresses/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("FrontEnd/{adrsId}")]
+        public async Task<IActionResult> PutAddressFrontEnd(int adrsId, Address address)
+        {
+            if (adrsId != address.AddressId)
+            {
+                return BadRequest();
+            }
+
+            // Trova l'entità esistente nel database
+            var existingAddress = await _context.Addresses.FirstOrDefaultAsync(a => a.AddressId == adrsId);
+
+            if (existingAddress == null)
+            {
+                return NotFound();
+            }
+
+            existingAddress.AddressLine1 = address.AddressLine1;
+            existingAddress.AddressLine2 = address.AddressLine2;
+            existingAddress.City = address.City;
+            existingAddress.StateProvince = address.StateProvince;
+            existingAddress.CountryRegion = address.CountryRegion;
+            existingAddress.PostalCode = address.PostalCode;
+
+            existingAddress.ModifiedDate = DateTime.Now;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AddressExists(adrsId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         // POST: api/Addresses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

@@ -117,16 +117,19 @@ namespace BetaCycle_Padova.Controllers
 
                                 User newUser = new User
                                 {
+                                    Id = foundCustomer.Result.Value.CustomerId,
                                     Name = foundCustomer.Result.Value.FirstName,
                                     Surname = foundCustomer.Result.Value.LastName,
                                     Phone = foundCustomer.Result.Value.Phone,
                                     Mail = foundCustomer.Result.Value.EmailAddress,
-                                    OldCustomerId = foundCustomer.Result.Value.CustomerId
+                                   // OldCustomerId = foundCustomer.Result.Value.CustomerId
                                 };
 
                                 newUser.Credential = newCredential;
                                 //con PostUser newCredential in tab Credentials prendere Id da newUser in tab User (spero? -Marti)
-                                var migrateUser = await _usersController.PostUser(newUser);
+                                var migrateUser = await _usersController.PostUserSP(newUser); //NICHOLAS 17/05/2024 - uso di storedProcedure
+
+                                
 
                                 // Console.WriteLine(migrateUser.Result.GetType()); // Microsoft.AspNetCore.Mvc.CreatedAtActionResult
 

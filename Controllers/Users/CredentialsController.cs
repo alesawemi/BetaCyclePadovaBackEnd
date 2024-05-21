@@ -97,10 +97,17 @@ namespace BetaCycle_Padova.Controllers.Users
         [HttpPost]
         public async Task<ActionResult<Credential>> PostCredential(Credential credential)
         {
-            _context.Credentials.Add(credential);
+            
+
+            //_context.Credentials.Add(credential);
             try
             {
-                await _context.SaveChangesAsync();
+                
+
+                _context.Credentials.Add(credential);
+                await _context.SaveChangesAsync();             
+
+                return CreatedAtAction("GetCredential", new { id = credential.Id }, credential);
             }
             catch (DbUpdateException)
             {
@@ -113,8 +120,9 @@ namespace BetaCycle_Padova.Controllers.Users
                     throw;
                 }
             }
+            
 
-            return CreatedAtAction("GetCredential", new { id = credential.Id }, credential);
+           // return CreatedAtAction("GetCredential", new { id = credential.Id }, credential);
         }
 
         // DELETE: api/Credentials/5

@@ -102,10 +102,14 @@ namespace BetaCycle_Padova.Controllers.Users
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Users.Add(user);
+
             try
             {
+                _context.Users.Add(user);
+
                 await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetUser", new { id = user.Id }, user);
             }
             catch (DbUpdateException dbex)
             {
@@ -122,7 +126,43 @@ namespace BetaCycle_Padova.Controllers.Users
                 }
             }
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+
+            //return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        }
+
+
+        // POST: api/Users
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("StoredP")]
+        public async Task<ActionResult<User>> PostUserSP(User user)
+        {
+
+            try
+            {
+                _context.Users.Add(user);
+
+                // Chiama la stored procedure per l'inserimento dei dati
+                await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC migration @IdOld = {user.Id}, @Name={user.Name}, @Surname={user.Surname}, @Phone={user.Phone}, @Mail={user.Mail}, @PasswordHash={user.Credential.Password}, @PasswordSalt={user.Credential.Salt}, @UserId = {user.Id}");            
+
+                return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            }
+            catch (DbUpdateException dbex)
+            {
+                if (UserExists(user.Id))
+                {
+                    UserNlogLogger.Error(dbex, "UserController - PostUser - UserExists, Conflict");
+                    return Conflict(); //CAPIRE COSA TI RESTITUISCE
+                }
+                else
+                {
+                    Console.WriteLine("PROBLEMA NEL POST USER: " + dbex.Message);
+                    UserNlogLogger.Error(dbex, "UserController - PostUser - BadRequest");
+                    return BadRequest(dbex);
+                }
+            }
+            
+
+            //return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
 

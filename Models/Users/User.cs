@@ -15,27 +15,29 @@ public partial class User
 
     public string? Mail { get; set; }
 
-    public int OldCustomerId { get; set; }
+   // public int OldCustomerId { get; set; }
 
     public virtual Credential? Credential { get; set; }
 
     public User() { }
 
     /// <summary>
-    /// User parametrized
+    /// User old
     /// </summary>
     /// <param name="name"></param>
     /// <param name="surname"></param>
     /// <param name="phone"></param>
     /// <param name="mail"></param>
     /// <param name="credential"></param>
+    /// <param name="oldCust"></param>
     public User(string name, string surname, string phone, string mail, Credential credential, int oldCust)
-    {       
+    {
+        Id = oldCust;
         Name = name;
         Surname = surname;
         Phone = phone;
         Mail = mail;
-        OldCustomerId = oldCust;
+       // OldCustomerId = oldCust; - abbiamo modificato la logica ho tolto la colonna e inserisco il vecchioCustomerID nella colonna ID - i nuovi partono da 40.000
         Credential = credential;
     }
     /// <summary>
