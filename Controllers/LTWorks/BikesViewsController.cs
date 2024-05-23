@@ -387,7 +387,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         //    ProductProperties availableOptions = new ProductProperties();
         //    try
         //    {
-        //        var colors = await _context.BikesViews
+        //        var colors = await _LT2019context.BikesViews
         //            .FromSqlRaw($"SELECT [Color] FROM [AdventureWorksLT2019].[SalesLT].[BikesView]" +
         //                $"GROUP BY [Color]")
         //            .Select(x => new xProperty(x.Color))
@@ -415,7 +415,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         //    ProductProperties availableOptions = new ProductProperties();
         //    try
         //    {
-        //        var colors = await _context.availableOptions
+        //        var colors = await _LT2019context.availableOptions
         //            .FromSqlRaw($"EXECUTE [dbo].[sp_GetProductProperties_AvailableColors]")
         //            .ToListAsync();
         //        foreach (var col in colors)

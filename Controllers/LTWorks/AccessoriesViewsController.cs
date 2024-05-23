@@ -155,7 +155,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             try
             {
                 //#region COLORS
-                //var colors = await _context.AccessoriesViews
+                //var colors = await _LT2019context.AccessoriesViews
                 //    .FromSqlRaw($"SELECT [Color]" +
                 //        $"FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]" +
                 //        $"GROUP BY [Color]")
@@ -170,7 +170,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 //#endregion
 
                 //#region CATEGORIES
-                //var categories = await _context.AccessoriesViews
+                //var categories = await _LT2019context.AccessoriesViews
                 //    .FromSqlRaw($"SELECT [ProductCategory]" +
                 //        $"FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]" +
                 //        $"GROUP BY [ProductCategory]")
@@ -181,7 +181,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 //#endregion
 
                 //#region PRICE
-                //var result = await _context.AccessoriesViews
+                //var result = await _LT2019context.AccessoriesViews
                 //   .FromSql($"SELECT * FROM [AdventureWorksLT2019].[SalesLT].[AccessoriesView]")
                 //   .ToListAsync();
 

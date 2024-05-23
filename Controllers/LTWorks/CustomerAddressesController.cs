@@ -14,25 +14,28 @@ namespace BetaCycle_Padova.Controllers.LTWorks
     [ApiController]
     public class CustomerAddressesController : ControllerBase
     {
-        private readonly AdventureWorksLt2019Context _context;
+        private readonly AdventureWorksLt2019Context _LT2019context;
 
-        public CustomerAddressesController(AdventureWorksLt2019Context context)
+        private readonly BetacycleUsersContext _usersContext;
+
+        public CustomerAddressesController(AdventureWorksLt2019Context LTcontext, BetacycleUsersContext usersContext)
         {
-            _context = context;
+            _LT2019context = LTcontext;
+            _usersContext = usersContext;
         }
 
         // GET: api/CustomerAddresses
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerAddress>>> GetCustomerAddresses()
         {
-            return await _context.CustomerAddresses.ToListAsync();
+            return await _LT2019context.CustomerAddresses.ToListAsync();
         }
 
         // GET: api/CustomerAddresses/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerAddress>> GetCustomerAddress(int id)
         {
-            var customerAddress = await _context.CustomerAddresses.FindAsync(id);
+            var customerAddress = await _LT2019context.CustomerAddresses.FindAsync(id);
 
             if (customerAddress == null)
             {
@@ -47,7 +50,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         public async Task<ActionResult<CustomerAddressFrontEnd>> GetCustomerAddressByCustId(int custId)
         {
             //faccio una ricerca per CustomerId
-            var customerAddress = await _context.CustomerAddresses.FirstOrDefaultAsync(c => c.CustomerId == custId);
+            var customerAddress = await _LT2019context.CustomerAddresses.FirstOrDefaultAsync(c => c.CustomerId == custId);
 
             if (customerAddress == null)
             {
@@ -69,7 +72,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         public async Task<ActionResult<CustomerAddressFrontEnd>> GetCustomerAddressByAdrsId(int adrsId)
         {
             //Faccio una ricerca per AddressId
-            var customerAddress = await _context.CustomerAddresses.FirstOrDefaultAsync(a => a.AddressId == adrsId);
+            var customerAddress = await _LT2019context.CustomerAddresses.FirstOrDefaultAsync(a => a.AddressId == adrsId);
 
             if (customerAddress == null)
             {
@@ -97,11 +100,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 return BadRequest();
             }
 
-            _context.Entry(customerAddress).State = EntityState.Modified;
+            _LT2019context.Entry(customerAddress).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _LT2019context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -118,6 +121,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+
         // PUT: api/CustomerAddresses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("Customer/{custId}")]
@@ -128,8 +132,22 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 return BadRequest();
             }
 
+            // Verifica se il CustomerId esiste nella tabella Customers del vecchio database
+            var customerExistsInOldDb = await _LT2019context.Customers.AnyAsync(c => c.CustomerId == customerAddressFE.CustomerId);
+
+            // Se il CustomerId non esiste nella tabella Customers, verifica se esiste nella tabella Users del nuovo database
+            if (!customerExistsInOldDb)
+            {
+                var userExistsInNewDb = await _usersContext.Users.AnyAsync(u => u.Id == customerAddressFE.CustomerId);
+
+                if (!userExistsInNewDb)
+                {
+                    return NotFound("CustomerId not found in either Customers or Users tables.");
+                }
+            }
+
             // Trova l'entità esistente nel database
-            var customerAddress = await _context.CustomerAddresses
+            var customerAddress = await _LT2019context.CustomerAddresses
                                                 .FirstOrDefaultAsync(ca => ca.CustomerId == custId);
 
             if (customerAddress == null)
@@ -138,14 +156,14 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             }
 
             // Aggiorna solo i campi specifici
-            //customerAddress.AddressId = customerAddressFE.AddressId;
+            // customerAddress.AddressId = customerAddressFE.AddressId; // Questo è commentato, come nell'originale
             customerAddress.AddressType = customerAddressFE.AddressType;
             customerAddress.ModifiedDate = DateTime.Now;
 
             try
             {
                 // Salva i cambiamenti nel database
-                await _context.SaveChangesAsync();
+                await _LT2019context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -159,25 +177,18 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 }
             }
 
-
             return NoContent();
         }
-
-
-
-
-
-
 
         // POST: api/CustomerAddresses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<CustomerAddress>> PostCustomerAddress(CustomerAddress customerAddress)
         {
-            _context.CustomerAddresses.Add(customerAddress);
+            _LT2019context.CustomerAddresses.Add(customerAddress);
             try
             {
-                await _context.SaveChangesAsync();
+                await _LT2019context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -199,6 +210,20 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         [HttpPost("FrontEnd")]
         public async Task<ActionResult<CustomerAddress>> PostCustomerAddressFrontEnd(CustomerAddressFrontEnd customerAddressFE)
         {
+            // Verifica se il CustomerId esiste nella tabella Customers del vecchio database
+            var customerExistsInOldDb = await _LT2019context.Customers.AnyAsync(c => c.CustomerId == customerAddressFE.CustomerId);
+
+            // Se il CustomerId non esiste nella tabella Customers, verifica se esiste nella tabella Users del nuovo database
+            if (!customerExistsInOldDb)
+            {
+                var userExistsInNewDb = await _usersContext.Users.AnyAsync(u => u.Id == customerAddressFE.CustomerId);
+
+                if (!userExistsInNewDb)
+                {
+                    return NotFound("CustomerId not found in either Customers or Users tables.");
+                }
+            }
+
             CustomerAddress customerAddress = new CustomerAddress
             {
                 AddressId = customerAddressFE.AddressId,
@@ -206,10 +231,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 AddressType = customerAddressFE.AddressType
             };
 
-            _context.CustomerAddresses.Add(customerAddress);
+            _LT2019context.CustomerAddresses.Add(customerAddress);
             try
             {
-                await _context.SaveChangesAsync();
+                await _LT2019context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -227,25 +252,27 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         }
 
 
+
         // DELETE: api/CustomerAddresses/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomerAddress(int id)
         {
-            var customerAddress = await _context.CustomerAddresses.FindAsync(id);
+            var customerAddress = await _LT2019context.CustomerAddresses.FindAsync(id);
             if (customerAddress == null)
             {
                 return NotFound();
             }
 
-            _context.CustomerAddresses.Remove(customerAddress);
-            await _context.SaveChangesAsync();
+            _LT2019context.CustomerAddresses.Remove(customerAddress);
+            await _LT2019context.SaveChangesAsync();
 
             return NoContent();
         }
 
+
         private bool CustomerAddressExists(int id)
         {
-            return _context.CustomerAddresses.Any(e => e.CustomerId == id);
+            return _LT2019context.CustomerAddresses.Any(e => e.CustomerId == id);
         }
     }
 }
