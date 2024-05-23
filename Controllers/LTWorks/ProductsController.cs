@@ -132,5 +132,6 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         {
             return _context.Products.Any(e => e.ProductId == id);
         }
+
     }
 }

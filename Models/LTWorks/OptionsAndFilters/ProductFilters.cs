@@ -1,4 +1,4 @@
-﻿namespace BetaCycle_Padova.Models.LTWorks.Filters
+﻿namespace BetaCycle_Padova.Models.LTWorks.OptionsAndFilters
 {
     public class ProductFilters
     {
@@ -19,10 +19,10 @@
         {
             descPrice = false;
             ascPrice = false;
-            productName = "allProducts";
-            color = "color";
-            size = "size";
-            productCategory = "category";
+            productName = string.Empty;
+            color = string.Empty;
+            size = string.Empty;
+            productCategory = string.Empty;
             maxPrice = 0;
             minPrice = 0;
             maxWeight = 0;
@@ -34,8 +34,8 @@
 
     public class Interval
     {
-        public decimal min { get; set; }
-        public decimal max { get; set; }
+        public decimal min { get; set; } = 0;
+        public decimal max { get; set; } = 0;
     }
 
 

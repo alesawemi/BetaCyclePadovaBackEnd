@@ -98,4 +98,6 @@ public partial class Product
     public virtual ProductModel? ProductModel { get; set; }
 
     public virtual ICollection<SalesOrderDetail> SalesOrderDetails { get; set; } = new List<SalesOrderDetail>();
+
+    public byte[]? LargeImage { get; set; }
 }

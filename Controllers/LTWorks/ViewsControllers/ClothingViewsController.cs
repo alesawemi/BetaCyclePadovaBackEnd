@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BetaCycle_Padova.Controllers.Context;
-using BetaCycle_Padova.Models.LTWorks;
+using BetaCycle_Padova.Models.LTWorks.Views;
 
-namespace BetaCycle_Padova.Controllers.LTWorks
+namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
     [Route("api/[controller]")]
     [ApiController]

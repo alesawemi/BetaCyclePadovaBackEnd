@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BetaCycle_Padova.Models.LTWorks.Filters
+namespace BetaCycle_Padova.Models.LTWorks.OptionsAndFilters
 {
     public class ProductProperties
     {
-        public List<string> availableColors {  get; set; }
-        public List<string> availableCategories { get; set; }
-        public List<string> availableSizes { get; set; }       
+        public List<string?> availableColors {  get; set; }
+        public List<string?> availableCategories { get; set; }
+        public List<string?> availableSizes { get; set; }       
         public PriceAndWeightMapping PriceAndWeight { get; set; }
         //public decimal priceMax { get; set; }
         //public decimal priceMin { get; set; }
@@ -30,7 +30,7 @@ namespace BetaCycle_Padova.Models.LTWorks.Filters
     {
         [Key]
         public string? Option { get; set; }
-        public xProperty (string option) { Option = option; }
+        public xProperty (string? option) { Option = option; }
         
     }
 
@@ -44,9 +44,9 @@ namespace BetaCycle_Padova.Models.LTWorks.Filters
 
         public PriceAndWeightMapping()
         {
-            MaxP = (30 * 100);
+            MaxP = 0;
             MinP = 0;
-            MaxW = (30 * 100);
+            MaxW = 0;
             MinW = 0;
         }
 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace BetaCycle_Padova.Models.LTWorks;
+namespace BetaCycle_Padova.Models.LTWorks.Views;
 
-public partial class BikesView
+public partial class AccessoriesView
 {
     [Key]
     public int ProductId { get; set; }
