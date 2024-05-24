@@ -28,11 +28,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         [HttpGet("GetByParam/{param}")]
-        public async Task<ActionResult<IEnumerable<ProductsView>>> GetByParam(string param)
+        public async Task<ActionResult<IEnumerable<GenericView>>> GetByParam(string param)
         {
-            return await _context.ProductsView.FromSqlRaw(
+            return await _context.GenericView.FromSqlRaw(
                         $"SELECT * FROM [dbo].[vProductsView] WHERE " +
-                        $"[Name] LIKE '%{param}%' OR " +
+                        $"[ProductName] LIKE '%{param}%' OR " +
                         $"[Color] LIKE '%{param}%' OR " +
                         $"[Size] LIKE '%{param}%' OR " +
                         $"[ProductCategory] LIKE '%{param}%' OR " +

@@ -21,8 +21,8 @@ public partial class AdventureWorksLt2019Context : DbContext
     #region nuove mappature per recuperare info dal db
     public DbSet<xProperty> avOptions { get; set; }
     public DbSet<PriceAndWeightMapping> PriceAndWeightOptions { get; set; }
-    public DbSet<GenericView> GenericViews { get; set; }
-    public DbSet<ProductsView> ProductsView { get; set; }
+    public DbSet<GenericView> GenericView { get; set; }
+    //public DbSet<ProductsView> ProductsView { get; set; }
     #endregion
 
     public virtual DbSet<AccessoriesView> AccessoriesViews { get; set; }

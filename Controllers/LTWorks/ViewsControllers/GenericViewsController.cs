@@ -40,7 +40,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             string fromTable = $"[AdventureWorksLT2019].[SalesLT].{ViewName}";
 
-            return await _context.GenericViews
+            return await _context.GenericView
                     .FromSqlRaw($"SELECT * FROM {fromTable}").ToListAsync();
         }
 
@@ -286,7 +286,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             var sqlInterpolatedString = FormattableStringFactory.Create(queryString, parameters.ToArray());
 
-            var query = _context.GenericViews
+            var query = _context.GenericView
                 .FromSql(sqlInterpolatedString);
 
             var filtered = await query.ToListAsync();
