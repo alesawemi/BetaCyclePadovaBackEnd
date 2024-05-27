@@ -33,8 +33,20 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             switch (view)
             {
+                case "accessories":
+                    ViewName = "[AccessoriesView]";
+                    break;
+
+                case "bikes":
+                    ViewName = "[BikesView]";
+                    break;
+
                 case "clothing":
                     ViewName = "[ClothingView]";
+                    break;
+
+                case "components":
+                    ViewName = "[ComponentsView]";
                     break;
             }
 
@@ -44,6 +56,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                     .FromSqlRaw($"SELECT * FROM {fromTable}").ToListAsync();
         }
 
+
+
         [HttpGet("GetProperties")]
         public async Task<ActionResult<ProductProperties>> GetProductPropertiesFromView([FromQuery] string view)
         {
@@ -51,8 +65,20 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             switch (view)
             {
+                case "accessories":
+                    ViewName = "[AccessoriesView]";
+                    break;
+
+                case "bikes":
+                    ViewName = "[BikesView]";
+                    break;
+
                 case "clothing":
                     ViewName = "[ClothingView]";
+                    break;
+
+                case "components":
+                    ViewName = "[ComponentsView]";
                     break;
             }
 
@@ -64,7 +90,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             {
                 #region COLORS
                 var colors = await _context.avOptions
-                    .FromSqlRaw($"SELECT COALESCE([Color], 'other') FROM {fromTable}" +
+                    .FromSqlRaw($"SELECT COALESCE([Color], 'other') FROM {fromTable} " +
                         $"GROUP BY [Color]")
                     .ToListAsync();
 
@@ -77,7 +103,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
                 #region CATEGORIES
                 var categories = await _context.avOptions
-                    .FromSqlRaw($"SELECT COALESCE([ProductCategory], 'other') FROM {fromTable}" +
+                    .FromSqlRaw($"SELECT COALESCE([ProductCategory], 'other') FROM {fromTable} " +
                         $"GROUP BY [ProductCategory]")
                     .ToListAsync();
 
@@ -90,7 +116,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
                 #region SIZES
                 var size = await _context.avOptions
-                    .FromSqlRaw($"SELECT COALESCE([Size], 'other') FROM {fromTable}" +
+                    .FromSqlRaw($"SELECT COALESCE([Size], 'other') FROM {fromTable} " +
                         $"GROUP BY [Size]")
                     .ToListAsync();
 
@@ -134,8 +160,20 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             switch (view)
             {
+                case "accessories":
+                    ViewName = "[AccessoriesView]";
+                    break;
+
+                case "bikes":
+                    ViewName = "[BikesView]";
+                    break;
+
                 case "clothing":
                     ViewName = "[ClothingView]";
+                    break;
+
+                case "components":
+                    ViewName = "[ComponentsView]";
                     break;
             }
 
