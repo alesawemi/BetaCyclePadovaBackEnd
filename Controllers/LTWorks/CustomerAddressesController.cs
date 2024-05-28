@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.LTWorks;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks
 {
@@ -23,6 +24,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _LT2019context = LTcontext;
             _usersContext = usersContext;
         }
+
+        private static Logger CustomerAddressNLogLogger = LogManager.GetCurrentClassLogger();
 
         // GET: api/CustomerAddresses
         [HttpGet]
@@ -54,9 +57,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             if (customerAddress == null)
             {
+                CustomerAddressNLogLogger.Info("CustomerAddressesController - GetCustomerAddressByCustId - Address Not Found");
                 return NotFound();
             }
 
+            CustomerAddressNLogLogger.Info("CustomerAddressesController - GetCustomerAddressByCustId - Sending Address Data to FrontEnd");
             CustomerAddressFrontEnd customerAddressFE = new CustomerAddressFrontEnd
             {
                 CustomerId = customerAddress.CustomerId,
@@ -76,9 +81,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             if (customerAddress == null)
             {
+                CustomerAddressNLogLogger.Info("CustomerAddressesController - GetCustomerAddressByAdrsId - Address Not Found");
                 return NotFound();
             }
 
+            CustomerAddressNLogLogger.Info("CustomerAddressesController - GetCustomerAddressByAdrsId - Sending Address Data to FrontEnd");
             CustomerAddressFrontEnd customerAddressFE = new CustomerAddressFrontEnd
             {
                 CustomerId = customerAddress.CustomerId,
@@ -97,6 +104,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         {
             if (id != customerAddress.CustomerId)
             {
+                CustomerAddressNLogLogger.Error("CustomerAddressesController - PutCustomerAddress - Id Not Found");
                 return BadRequest();
             }
 

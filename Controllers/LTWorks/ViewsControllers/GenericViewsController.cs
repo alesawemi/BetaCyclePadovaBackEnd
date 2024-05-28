@@ -12,6 +12,7 @@ using DnsClient;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Runtime.CompilerServices;
 using BetaCycle_Padova.Models.LTWorks.Views;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
@@ -25,6 +26,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         {
             _context = context;
         }
+
+        private static Logger GenericViewNlogLogger = LogManager.GetCurrentClassLogger();
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GenericView>>> GetAllItemsFromView([FromQuery] string view)
@@ -52,8 +55,20 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             string fromTable = $"[AdventureWorksLT2019].[SalesLT].{ViewName}";
 
-            return await _context.GenericView
-                    .FromSqlRaw($"SELECT * FROM {fromTable}").ToListAsync();
+            try
+            {
+                GenericViewNlogLogger.Info("Generic Views Controller - GetAllItemsFromView");
+
+                return await _context.GenericView
+                        .FromSqlRaw($"SELECT * FROM {fromTable}").ToListAsync();
+            }
+            catch (Exception ex) 
+            {
+                GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
+                    "GetAllItemsFromView");
+
+                return BadRequest(new { message = "Eccezione sollevata da GetAllItemsFromView in GenericViewsController." });
+            }
         }
 
 
@@ -88,7 +103,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             try
             {
+                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView");
+
                 #region COLORS
+                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - COLORS");
                 var colors = await _context.avOptions
                     .FromSqlRaw($"SELECT COALESCE([Color], 'other') FROM {fromTable} " +
                         $"GROUP BY [Color]")
@@ -102,6 +120,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                 #endregion
 
                 #region CATEGORIES
+                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - CATEGORIES");
                 var categories = await _context.avOptions
                     .FromSqlRaw($"SELECT COALESCE([ProductCategory], 'other') FROM {fromTable} " +
                         $"GROUP BY [ProductCategory]")
@@ -115,6 +134,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                 #endregion
 
                 #region SIZES
+                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - SIZES");
                 var size = await _context.avOptions
                     .FromSqlRaw($"SELECT COALESCE([Size], 'other') FROM {fromTable} " +
                         $"GROUP BY [Size]")
@@ -128,6 +148,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                 #endregion
 
                 #region PRICE and WEIGHT
+                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - PRICE & WEIGHT");
                 var MaxMin = await _context.PriceAndWeightOptions
                     .FromSqlRaw($"SELECT COALESCE(MAX(ListPrice), 0) AS MaxP, " +
                                 $"COALESCE(MIN(ListPrice), 0) AS MinP, " +
@@ -139,9 +160,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                 availableOptions.PriceAndWeight = MaxMin;
                 #endregion
 
+                
+
             }
             catch (Exception ex)
             {
+                GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
+                    "GetProductPropertiesFromView");
                 Console.WriteLine(ex);
             }
 
@@ -182,153 +207,176 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             var whereClauses = new List<string>();
             var parameters = new List<object>();
 
-            if (Filters.productName != "allProducts")
+            try
             {
-                whereClauses.Add("[ProductName] LIKE {0}");
-                parameters.Add($"%{Filters.productName}%");
-            }
+                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView");
 
-            if (Filters.color != "color")
-            {
-                var colors = Filters.color.Split(":").Skip(1).ToList();
-                if (colors.Count > 0)
+                if (Filters.productName != "allProducts")
                 {
-                    var colorConditions = new List<string>();
-                    foreach (var col in colors)
-                    {
-                        if (col == "other")
-                            colorConditions.Add("[Color] IS NULL");
-                        else
-                        {
-                            colorConditions.Add($"[Color] = {{{parameters.Count}}}");
-                            parameters.Add(col);
-                        }
-                    }
-                    whereClauses.Add($"({string.Join(" OR ", colorConditions)})");
+                    whereClauses.Add("[ProductName] LIKE {0}");
+                    parameters.Add($"%{Filters.productName}%");
                 }
-            }
 
-            if (Filters.productCategory != "category")
-            {
-                var categories = Filters.productCategory.Split(":").Skip(1).ToList();
-                if (categories.Count > 0)
+                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - COLORS");
+                if (Filters.color != "color")
                 {
-                    var categoryConditions = new List<string>();
-                    foreach (var cat in categories)
+                    var colors = Filters.color.Split(":").Skip(1).ToList();
+                    if (colors.Count > 0)
                     {
-                        if (cat == "other")
-                            categoryConditions.Add("[ProductCategory] IS NULL");
-                        else
+                        var colorConditions = new List<string>();
+                        foreach (var col in colors)
                         {
-                            categoryConditions.Add($"[ProductCategory] = {{{parameters.Count}}}");
-                            parameters.Add(cat);
+                            if (col == "other")
+                                colorConditions.Add("[Color] IS NULL");
+                            else
+                            {
+                                colorConditions.Add($"[Color] = {{{parameters.Count}}}");
+                                parameters.Add(col);
+                            }
                         }
-                    }
-                    whereClauses.Add($"({string.Join(" OR ", categoryConditions)})");
-                }
-            }
-
-            if (Filters.size != "size")
-            {
-                var sizes = Filters.size.Split(":").Skip(1).ToList();
-                if (sizes.Count > 0)
-                {
-                    var sizeConditions = new List<string>();
-                    foreach (var s in sizes)
-                    {
-                        if (s == "other")
-                            sizeConditions.Add("[Size] IS NULL");
-                        else
-                        {
-                            sizeConditions.Add($"[Size] = {{{parameters.Count}}}");
-                            parameters.Add(s);
-                        }
-                    }
-                    whereClauses.Add($"({string.Join(" OR ", sizeConditions)})");
-                }
-            }
-
-            if (Filters.pIntervals.Count > 0)
-            {
-                var priceConditions = new List<string>();
-                foreach (var pI in Filters.pIntervals)
-                {
-                    if (pI is not null)  //ulteriore controllo di sicurezza (anche se da fEnd non dovrebbero arrivare dati compromessi)
-                    {
-                        var conditionParts = new List<string>();
-                        if (pI.max > 0)
-                        {
-                            conditionParts.Add($"[ListPrice] <= {{{parameters.Count}}}");
-                            parameters.Add(pI.max);
-                        }
-                        if (pI.min > 0)
-                        {
-                            conditionParts.Add($"[ListPrice] > {{{parameters.Count}}}");
-                            parameters.Add(pI.min);
-                        }
-                        if (conditionParts.Any())
-                        {
-                            priceConditions.Add($"({string.Join(" AND ", conditionParts)})");
-                        }
+                        whereClauses.Add($"({string.Join(" OR ", colorConditions)})");
                     }
                 }
-                if (priceConditions.Any())
-                {
-                    whereClauses.Add($"({string.Join(" OR ", priceConditions)})");
-                }
-            }
 
-            if (Filters.wIntervals.Count > 0)
-            {
-                var weightConditions = new List<string>();
-                foreach (var wI in Filters.wIntervals)
+                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - CATEGORIES");
+                if (Filters.productCategory != "category")
                 {
-                    if (wI is not null) //ulteriore controllo di sicurezza
+                    var categories = Filters.productCategory.Split(":").Skip(1).ToList();
+                    if (categories.Count > 0)
                     {
-                        var conditionParts = new List<string>();
-                        if (wI.max > 0)
+                        var categoryConditions = new List<string>();
+                        foreach (var cat in categories)
                         {
-                            conditionParts.Add($"[Weight] <= {{{parameters.Count}}}");
-                            parameters.Add(wI.max);
+                            if (cat == "other")
+                                categoryConditions.Add("[ProductCategory] IS NULL");
+                            else
+                            {
+                                categoryConditions.Add($"[ProductCategory] = {{{parameters.Count}}}");
+                                parameters.Add(cat);
+                            }
                         }
-                        if (wI.min > 0)
-                        {
-                            conditionParts.Add($"[Weight] > {{{parameters.Count}}}");
-                            parameters.Add(wI.min);
-                        }
-                        if (conditionParts.Any())
-                        {
-                            weightConditions.Add($"({string.Join(" AND ", conditionParts)})");
-                        }
+                        whereClauses.Add($"({string.Join(" OR ", categoryConditions)})");
                     }
                 }
-                if (weightConditions.Any())
+
+                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - SIZES");
+                if (Filters.size != "size")
                 {
-                    whereClauses.Add($"({string.Join(" OR ", weightConditions)})");
+                    var sizes = Filters.size.Split(":").Skip(1).ToList();
+                    if (sizes.Count > 0)
+                    {
+                        var sizeConditions = new List<string>();
+                        foreach (var s in sizes)
+                        {
+                            if (s == "other")
+                                sizeConditions.Add("[Size] IS NULL");
+                            else
+                            {
+                                sizeConditions.Add($"[Size] = {{{parameters.Count}}}");
+                                parameters.Add(s);
+                            }
+                        }
+                        whereClauses.Add($"({string.Join(" OR ", sizeConditions)})");
+                    }
                 }
+
+                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - PRICE");
+                if (Filters.pIntervals.Count > 0)
+                {
+                    var priceConditions = new List<string>();
+                    foreach (var pI in Filters.pIntervals)
+                    {
+                        if (pI is not null)  //ulteriore controllo di sicurezza (anche se da fEnd non dovrebbero arrivare dati compromessi)
+                        {
+                            var conditionParts = new List<string>();
+                            if (pI.max > 0)
+                            {
+                                conditionParts.Add($"[ListPrice] <= {{{parameters.Count}}}");
+                                parameters.Add(pI.max);
+                            }
+                            if (pI.min > 0)
+                            {
+                                conditionParts.Add($"[ListPrice] > {{{parameters.Count}}}");
+                                parameters.Add(pI.min);
+                            }
+                            if (conditionParts.Any())
+                            {
+                                priceConditions.Add($"({string.Join(" AND ", conditionParts)})");
+                            }
+                        }
+                    }
+                    if (priceConditions.Any())
+                    {
+                        whereClauses.Add($"({string.Join(" OR ", priceConditions)})");
+                    }
+                }
+
+                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - WEIGHTS");
+                if (Filters.wIntervals.Count > 0)
+                {
+                    var weightConditions = new List<string>();
+                    foreach (var wI in Filters.wIntervals)
+                    {
+                        if (wI is not null) //ulteriore controllo di sicurezza
+                        {
+                            var conditionParts = new List<string>();
+                            if (wI.max > 0)
+                            {
+                                conditionParts.Add($"[Weight] <= {{{parameters.Count}}}");
+                                parameters.Add(wI.max);
+                            }
+                            if (wI.min > 0)
+                            {
+                                conditionParts.Add($"[Weight] > {{{parameters.Count}}}");
+                                parameters.Add(wI.min);
+                            }
+                            if (conditionParts.Any())
+                            {
+                                weightConditions.Add($"({string.Join(" AND ", conditionParts)})");
+                            }
+                        }
+                    }
+                    if (weightConditions.Any())
+                    {
+                        whereClauses.Add($"({string.Join(" OR ", weightConditions)})");
+                    }
+                }
+
+                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - query string");
+                var queryString = $"SELECT * FROM {fromTable} ";
+
+                if (whereClauses.Any())
+                    queryString += "WHERE " + string.Join(" AND ", whereClauses);
+
+                if (Filters.ascPrice)
+                {
+                    GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - ascending price");
+                    queryString += " ORDER BY [ListPrice]";
+                }
+                else if (Filters.descPrice)
+                {
+                    GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - descending price");
+                    queryString += " ORDER BY [ListPrice] DESC";
+                }
+
+                var sqlInterpolatedString = FormattableStringFactory.Create(queryString, parameters.ToArray());
+
+                var query = _context.GenericView
+                    .FromSql(sqlInterpolatedString);
+
+                var filtered = await query.ToListAsync();
+                
+                return filtered;
             }
-
-            var queryString = $"SELECT * FROM {fromTable} ";
-
-            if (whereClauses.Any())
-                queryString += "WHERE " + string.Join(" AND ", whereClauses);
-
-            if (Filters.ascPrice)
+            catch (Exception ex) 
             {
-                queryString += " ORDER BY [ListPrice]";
+                GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
+                    "GetWithFiltersFromView");
+
+                return BadRequest(new { message = "Eccezione sollevata da GetWithFiltersFromView in GenericViewsController." });
             }
-            else if (Filters.descPrice)
-            {
-                queryString += " ORDER BY [ListPrice] DESC";
-            }
 
-            var sqlInterpolatedString = FormattableStringFactory.Create(queryString, parameters.ToArray());
-
-            var query = _context.GenericView
-                .FromSql(sqlInterpolatedString);
-
-            var filtered = await query.ToListAsync();
-            return filtered;
+            
         }
     }
 }

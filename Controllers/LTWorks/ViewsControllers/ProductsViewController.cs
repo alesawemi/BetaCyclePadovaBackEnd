@@ -13,6 +13,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System.Runtime.CompilerServices;
 using BetaCycle_Padova.Models.LTWorks.Views;
 using BetaCycle_Padova.Models.LTWorks;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
@@ -27,17 +28,32 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             _context = context;
         }
 
+        private static Logger ProductsViewNlogLogger = LogManager.GetCurrentClassLogger();
+
         [HttpGet("GetByParam/{param}")]
-        public async Task<ActionResult<IEnumerable<GenericView>>> GetByParam(string param)
+        public async Task<ActionResult<IEnumerable<ProductsView>>> GetByParam(string param)
         {
-            return await _context.GenericView.FromSqlRaw(
-                        $"SELECT * FROM [dbo].[vProductsView] WHERE " +
-                        $"[ProductName] LIKE '%{param}%' OR " +
-                        $"[Color] LIKE '%{param}%' OR " +
-                        $"[Size] LIKE '%{param}%' OR " +
-                        $"[ProductCategory] LIKE '%{param}%' OR " +
-                        $"[ProductModel] LIKE '%{param}%'"
-                    ).ToListAsync();
+            try
+            {
+                ProductsViewNlogLogger.Info("Products View Controller - GetByParam");
+
+                return await _context.ProductsView.FromSqlRaw(
+                                        $"SELECT * FROM [dbo].[vProductsView] WHERE " +
+                                        $"[ProductName] LIKE '%{param}%' OR " +
+                                        $"[Color] LIKE '%{param}%' OR " +
+                                        $"[Size] LIKE '%{param}%' OR " +
+                                        $"[ProductCategory] LIKE '%{param}%' OR " +
+                                        $"[ProductModel] LIKE '%{param}%'"
+                                    ).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                ProductsViewNlogLogger.Error("Products View Controller - Eccezione sollevata da " +
+                    "GetByParam");
+
+                return BadRequest(new { message = "Eccezione sollevata da GetByParam in Products View Controller." });
+            }
+            
             
         }
 

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BetaCycle_Padova.Models.LTWorks;
 
 public partial class LogTrace
 {
+    [Key]
+    public int ErrorID { get; set; }
     public string? MachineName { get; set; }
 
     public DateTime? Logged { get; set; }

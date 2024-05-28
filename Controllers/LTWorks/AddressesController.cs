@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.LTWorks;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks
 {
@@ -20,6 +21,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         {
             _context = context;
         }
+
+        private static Logger AddressNlogLogger = LogManager.GetCurrentClassLogger();
 
         // GET: api/Addresses
         [HttpGet]
@@ -46,7 +49,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAddress(int id, Address address)
-        {
+        {            
             if (id != address.AddressId)
             {
                 return BadRequest();
@@ -78,8 +81,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         [HttpPut("FrontEnd/{adrsId}")]
         public async Task<IActionResult> PutAddressFrontEnd(int adrsId, Address address)
         {
+            AddressNlogLogger.Info("AddressesController - PutAddressFrontEnd");
+
             if (adrsId != address.AddressId)
             {
+                AddressNlogLogger.Error("AddressesController - PutAddressFrontEnd - AddressId not found");
                 return BadRequest();
             }
 
@@ -88,6 +94,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             if (existingAddress == null)
             {
+                AddressNlogLogger.Error("AddressesController - PutAddressFrontEnd - NULL Address");
                 return NotFound();
             }
 

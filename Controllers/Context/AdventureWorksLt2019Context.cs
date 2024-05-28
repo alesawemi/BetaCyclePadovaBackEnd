@@ -22,6 +22,7 @@ public partial class AdventureWorksLt2019Context : DbContext
     public DbSet<xProperty> avOptions { get; set; }
     public DbSet<PriceAndWeightMapping> PriceAndWeightOptions { get; set; }
     public DbSet<GenericView> GenericView { get; set; }
+    public DbSet<ProductsView> ProductsView { get; set; }
     #endregion
 
     public virtual DbSet<AccessoriesView> AccessoriesViews { get; set; }
@@ -336,9 +337,11 @@ public partial class AdventureWorksLt2019Context : DbContext
 
         modelBuilder.Entity<LogTrace>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("LogTrace");
+            entity.HasKey(e => e.ErrorID).HasName("PK_LogTrace");
+
+            entity.ToTable("LogTrace");
+
+            entity.Property(e => e.ErrorID);
 
             entity.Property(e => e.Exception)
                 .HasMaxLength(1000)
