@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAca5CodeFirst.Models;
@@ -113,6 +114,11 @@ namespace BetaCycle_Padova
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                });
+
+            builder.Services.AddAuthorization(options =>
+                {
+                    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
                 });
 
 

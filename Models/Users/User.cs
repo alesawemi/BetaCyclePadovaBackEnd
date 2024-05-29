@@ -15,6 +15,8 @@ public partial class User
 
     public string? Mail { get; set; }
 
+    public string? Role { get; set; }
+
    // public int OldCustomerId { get; set; }
 
     public virtual Credential? Credential { get; set; }

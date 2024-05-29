@@ -205,7 +205,8 @@ namespace BetaCycle_Padova.Controllers.Users
                 Name = rUser.FirstName,
                 Surname = rUser.LastName,
                 Phone = rUser.Phone,
-                Mail = rUser.EmailAddress,                
+                Mail = rUser.EmailAddress,
+                Role = "user"
             };
             user.Credential = newCredential;
        

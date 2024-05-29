@@ -9,6 +9,7 @@ using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.LTWorks.OptionsAndFilters;
 using Humanizer;
 using BetaCycle_Padova.Models.LTWorks.Views;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
@@ -24,6 +25,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // GET: api/AccessoriesViews
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AccessoriesView>>> GetAccessoriesViews()
         {

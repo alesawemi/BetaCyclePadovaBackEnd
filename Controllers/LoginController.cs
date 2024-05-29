@@ -152,9 +152,11 @@ namespace BetaCycle_Padova.Controllers
                                     LoginNlogLogger.Info("LoginController - Migrazione completata!");
 
                                     // email e password corrette --> genero token e lo includo nel return come overload di Ok()
-                                    var token = GenerateJwtToken(credentials.Username);
 
                                     LoginNlogLogger.Info("LoginController - Generate Jwt Token  (vecchio db)");
+
+                                    var role = "user"; // esempio, potresti dover estrarre il ruolo da qualche parte
+                                    var token = GenerateJwtToken(credentials.Username, role);
 
                                     return Ok(new {token}); // (F)
                                 }
@@ -194,9 +196,18 @@ namespace BetaCycle_Padova.Controllers
                             LoginNlogLogger.Info("LoginController - Credenziali corrette (nuovo db)");
 
                             // email e password corrette --> genero token e lo includo nel return come overload di Ok()
-                            var token = GenerateJwtToken(credentials.Username);
 
                             LoginNlogLogger.Info("LoginController - Generate Jwt Token (nuovo db)");
+
+                            var role = "user"; 
+                            if (foundUser.Result.Value.Role == "admin")
+                                {
+                                    role = "admin";
+                                }
+
+                            var token = GenerateJwtToken(credentials.Username, role);
+
+
 
                             return Ok(new { token }); // (C)
                         }
@@ -327,7 +338,7 @@ namespace BetaCycle_Padova.Controllers
 
 
         #region metodo x generare il token Jwt
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username,string role)
         {
             try
             {
@@ -339,7 +350,8 @@ namespace BetaCycle_Padova.Controllers
                     //parametri che esistono grazie a SecurityTokenDescriptor = subject, issuer etc
                     Subject = new ClaimsIdentity(new[] //stiamo costruendo info fondamentali che andranno salvate nel token
                     {
-                        new Claim(ClaimTypes.Name, username)
+                        new Claim(ClaimTypes.Name, username),
+                        new Claim(ClaimTypes.Role, role)
                     }),
                     Expires = DateTime.Now.AddMinutes(_jwtSettings.ExpirationMinutes),
                     Issuer = _jwtSettings.Issuer,

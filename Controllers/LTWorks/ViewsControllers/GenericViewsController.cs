@@ -13,6 +13,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System.Runtime.CompilerServices;
 using BetaCycle_Padova.Models.LTWorks.Views;
 using NLog;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
@@ -176,6 +177,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
 
         [Route("GetWithFilters")]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<IEnumerable<GenericView>>> GetWithFiltersFromView([FromQuery] string view,
             ProductFilters Filters)
