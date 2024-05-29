@@ -58,7 +58,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             try
             {
-                GenericViewNlogLogger.Info("Generic Views Controller - GetAllItemsFromView");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetAllItemsFromView {ViewName}");
 
                 return await _context.GenericView
                         .FromSqlRaw($"SELECT * FROM {fromTable}").ToListAsync();
@@ -66,7 +66,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             catch (Exception ex) 
             {
                 GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
-                    "GetAllItemsFromView");
+                    $"GetAllItemsFromView {ViewName}");
 
                 return BadRequest(new { message = "Eccezione sollevata da GetAllItemsFromView in GenericViewsController." });
             }
@@ -104,10 +104,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             try
             {
-                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetProductPropertiesFromView {ViewName}");
 
                 #region COLORS
-                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - COLORS");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetProductPropertiesFromView {ViewName}- COLORS");
                 var colors = await _context.avOptions
                     .FromSqlRaw($"SELECT COALESCE([Color], 'other') FROM {fromTable} " +
                         $"GROUP BY [Color]")
@@ -121,7 +121,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                 #endregion
 
                 #region CATEGORIES
-                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - CATEGORIES");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetProductPropertiesFromView {ViewName}- CATEGORIES");
                 var categories = await _context.avOptions
                     .FromSqlRaw($"SELECT COALESCE([ProductCategory], 'other') FROM {fromTable} " +
                         $"GROUP BY [ProductCategory]")
@@ -135,7 +135,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                 #endregion
 
                 #region SIZES
-                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - SIZES");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetProductPropertiesFromView {ViewName}- SIZES");
                 var size = await _context.avOptions
                     .FromSqlRaw($"SELECT COALESCE([Size], 'other') FROM {fromTable} " +
                         $"GROUP BY [Size]")
@@ -149,7 +149,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                 #endregion
 
                 #region PRICE and WEIGHT
-                GenericViewNlogLogger.Info("Generic Views Controller - GetProductPropertiesFromView - PRICE & WEIGHT");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetProductPropertiesFromView {ViewName}- PRICE & WEIGHT");
+                
                 var MaxMin = await _context.PriceAndWeightOptions
                     .FromSqlRaw($"SELECT COALESCE(MAX(ListPrice), 0) AS MaxP, " +
                                 $"COALESCE(MIN(ListPrice), 0) AS MinP, " +
@@ -167,7 +168,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             catch (Exception ex)
             {
                 GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
-                    "GetProductPropertiesFromView");
+                    $"GetProductPropertiesFromView {ViewName}");
                 Console.WriteLine(ex);
             }
 
@@ -211,7 +212,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
             try
             {
-                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}");
 
                 if (Filters.productName != "allProducts")
                 {
@@ -219,7 +220,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                     parameters.Add($"%{Filters.productName}%");
                 }
 
-                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - COLORS");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- COLORS");
                 if (Filters.color != "color")
                 {
                     var colors = Filters.color.Split(":").Skip(1).ToList();
@@ -240,7 +241,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                     }
                 }
 
-                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - CATEGORIES");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- CATEGORIES");
                 if (Filters.productCategory != "category")
                 {
                     var categories = Filters.productCategory.Split(":").Skip(1).ToList();
@@ -261,7 +262,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                     }
                 }
 
-                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - SIZES");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- SIZES");
                 if (Filters.size != "size")
                 {
                     var sizes = Filters.size.Split(":").Skip(1).ToList();
@@ -282,7 +283,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                     }
                 }
 
-                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - PRICE");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- PRICE");
                 if (Filters.pIntervals.Count > 0)
                 {
                     var priceConditions = new List<string>();
@@ -313,7 +314,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                     }
                 }
 
-                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - WEIGHTS");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- WEIGHTS");
                 if (Filters.wIntervals.Count > 0)
                 {
                     var weightConditions = new List<string>();
@@ -344,7 +345,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
                     }
                 }
 
-                GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - query string");
+                GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- query string");
                 var queryString = $"SELECT * FROM {fromTable} ";
 
                 if (whereClauses.Any())
@@ -352,12 +353,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
                 if (Filters.ascPrice)
                 {
-                    GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - ascending price");
+                    GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- ascending price");
                     queryString += " ORDER BY [ListPrice]";
                 }
                 else if (Filters.descPrice)
                 {
-                    GenericViewNlogLogger.Info("Generic Views Controller - GetWithFiltersFromView - descending price");
+                    GenericViewNlogLogger.Info($"Generic Views Controller - GetWithFiltersFromView {ViewName}- descending price");
                     queryString += " ORDER BY [ListPrice] DESC";
                 }
 
@@ -373,7 +374,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             catch (Exception ex) 
             {
                 GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
-                    "GetWithFiltersFromView");
+                    $"GetWithFiltersFromView {ViewName}");
 
                 return BadRequest(new { message = "Eccezione sollevata da GetWithFiltersFromView in GenericViewsController." });
             }
