@@ -23,6 +23,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BetaCycle_Padova.Controllers
 {
+    /// <summary>
+    /// Controller per la gestione del login degli utenti.
+    /// </summary>
     [ApiController] //attributo
     [Route("[controller]")]
     public class LoginController : ControllerBase
