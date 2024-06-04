@@ -21,6 +21,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all product model product descriptions.
+        /// </summary>
+        /// <returns>A list of product model product descriptions.</returns>
         // GET: api/ProductModelProductDescriptions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductModelProductDescription>>> GetProductModelProductDescriptions()
@@ -28,6 +32,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return await _context.ProductModelProductDescriptions.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a specific product model product description by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product model product description.</param>
+        /// <returns>The product model product description with the specified ID.</returns>
         // GET: api/ProductModelProductDescriptions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductModelProductDescription>> GetProductModelProductDescription(int id)
@@ -42,8 +51,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return productModelProductDescription;
         }
 
+        /// <summary>
+        /// Updates a specific product model product description by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product model product description to update.</param>
+        /// <param name="productModelProductDescription">The updated product model product description object.</param>
+        /// <returns>No content if the update is successful.</returns>
         // PUT: api/ProductModelProductDescriptions/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProductModelProductDescription(int id, ProductModelProductDescription productModelProductDescription)
         {
@@ -73,8 +87,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Adds a new product model product description.
+        /// </summary>
+        /// <param name="productModelProductDescription">The product model product description to add.</param>
+        /// <returns>The newly created product model product description.</returns>
         // POST: api/ProductModelProductDescriptions
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<ProductModelProductDescription>> PostProductModelProductDescription(ProductModelProductDescription productModelProductDescription)
         {
@@ -98,6 +116,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetProductModelProductDescription", new { id = productModelProductDescription.ProductModelId }, productModelProductDescription);
         }
 
+        /// <summary>
+        /// Deletes a specific product model product description by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product model product description to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         // DELETE: api/ProductModelProductDescriptions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductModelProductDescription(int id)
@@ -114,6 +137,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a product model product description with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the product model product description.</param>
+        /// <returns>True if the product model product description exists, otherwise false.</returns>
         private bool ProductModelProductDescriptionExists(int id)
         {
             return _context.ProductModelProductDescriptions.Any(e => e.ProductModelId == id);

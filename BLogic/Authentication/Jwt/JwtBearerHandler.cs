@@ -11,22 +11,39 @@ using WebAca5CodeFirst.Models;
 
 namespace CodeFirst.BLogic.Authentication.Jwt
 {
+    /// <summary>
+    /// JWT Bearer authentication handler.
+    /// </summary>
     public class JwtBearerHandler : AuthenticationHandler<JwtBearerOptions>
-    //public class JwtAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        //private readonly OldCustomersController _customersController;
-        //private readonly UsersController _usersController;
+        /// <summary>
+        /// Token validation parameters injected from Program.cs.
+        /// </summary>
+        private readonly TokenValidationParameters _tokenValidationParameters;
 
-        private readonly TokenValidationParameters _tokenValidationParameters; //ignetto i parametri definiti nel Program.cs
+        /// <summary>
+        /// Configuration for generating JWT tokens.
+        /// </summary>
+        private readonly JwtSettings _jwtSettings;
 
-        private readonly JwtSettings _jwtSettings; // Configurazione per la generazione dei token JWT
-
+        /// <summary>
+        /// Logger for JWT authentication.
+        /// </summary>
         private static Logger JwtNlogLogger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JwtBearerHandler"/> class.
+        /// </summary>
+        /// <param name="options">Monitor for JWT bearer options.</param>
+        /// <param name="logger">Logger factory.</param>
+        /// <param name="encoder">URL encoder.</param>
+        /// <param name="tokenValidationParameters">Token validation parameters.</param>
+        /// <param name="jwtSettings">JWT settings.</param>
         public JwtBearerHandler(
             IOptionsMonitor<JwtBearerOptions> options,
             ILoggerFactory logger,
-            UrlEncoder encoder, TokenValidationParameters tokenValidationParameters,
+            UrlEncoder encoder,
+            TokenValidationParameters tokenValidationParameters,
             IOptions<JwtSettings> jwtSettings) :
             base(options, logger, encoder)
         {
@@ -34,6 +51,10 @@ namespace CodeFirst.BLogic.Authentication.Jwt
             _jwtSettings = jwtSettings.Value;
         }
 
+        /// <summary>
+        /// Handles the JWT authentication process.
+        /// </summary>
+        /// <returns>The result of the authentication.</returns>
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             if (!Request.Headers.ContainsKey("Authorization"))
@@ -52,35 +73,33 @@ namespace CodeFirst.BLogic.Authentication.Jwt
 
             var token = authorizationHeader.Substring("Bearer ".Length).Trim();
 
-            JwtNlogLogger.Info("Jwt Bearer Handler - Controllo Autorizzazioni");
+            JwtNlogLogger.Info("Jwt Bearer Handler - Checking Authorizations");
 
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
-                tokenHandler.ValidateToken(token, _tokenValidationParameters, out var validatedToken); //salva dentro validatedToken 
+                tokenHandler.ValidateToken(token, _tokenValidationParameters, out var validatedToken); // saves into validatedToken 
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
 
                 var email = jwtToken.Claims.First(x => x.Type == ClaimTypes.Email).Value;
 
-                // non facciamo controlli di email nel db, assumiamo che sia sufficiente aver passato tutti i controlli precedenti sulle autorizzazioni
+                // we do not check the email in the database, we assume that passing all previous authorization checks is sufficient
 
                 var claims = new[] { new Claim(ClaimTypes.Email, email) };
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, Scheme.Name);
-                
-                JwtNlogLogger.Info("Jwt Bearer Handler ha autenticato il Token fornito");
+
+                JwtNlogLogger.Info("Jwt Bearer Handler authenticated the provided Token");
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)
             {
-                JwtNlogLogger.Error(ex, "Jwt Authentication Handler ha sollevato un'Eccezione");
+                JwtNlogLogger.Error(ex, "Jwt Authentication Handler raised an Exception");
                 return AuthenticateResult.Fail("Invalid token");
             }
         }
     }
-
-
 }

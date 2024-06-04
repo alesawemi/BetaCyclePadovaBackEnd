@@ -21,14 +21,21 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
-        // GET: api/SalesOrderDetails
+        /// <summary>
+        /// Retrieves all sales order details.
+        /// </summary>
+        /// <returns>A list of sales order details.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SalesOrderDetail>>> GetSalesOrderDetails()
         {
             return await _context.SalesOrderDetails.ToListAsync();
         }
 
-        // GET: api/SalesOrderDetails/5
+        /// <summary>
+        /// Retrieves a specific sales order detail by ID.
+        /// </summary>
+        /// <param name="id">The ID of the sales order detail.</param>
+        /// <returns>The sales order detail with the specified ID.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<SalesOrderDetail>> GetSalesOrderDetail(int id)
         {
@@ -42,8 +49,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return salesOrderDetail;
         }
 
-        // PUT: api/SalesOrderDetails/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Updates a specific sales order detail by ID.
+        /// </summary>
+        /// <param name="id">The ID of the sales order detail to update.</param>
+        /// <param name="salesOrderDetail">The updated sales order detail object.</param>
+        /// <returns>No content if the update is successful.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSalesOrderDetail(int id, SalesOrderDetail salesOrderDetail)
         {
@@ -73,8 +84,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
-        // POST: api/SalesOrderDetails
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Adds a new sales order detail.
+        /// </summary>
+        /// <param name="salesOrderDetail">The sales order detail to add.</param>
+        /// <returns>The newly created sales order detail.</returns>
         [HttpPost]
         public async Task<ActionResult<SalesOrderDetail>> PostSalesOrderDetail(SalesOrderDetail salesOrderDetail)
         {
@@ -98,7 +112,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetSalesOrderDetail", new { id = salesOrderDetail.SalesOrderId }, salesOrderDetail);
         }
 
-        // DELETE: api/SalesOrderDetails/5
+        /// <summary>
+        /// Deletes a specific sales order detail by ID.
+        /// </summary>
+        /// <param name="id">The ID of the sales order detail to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSalesOrderDetail(int id)
         {
@@ -114,6 +132,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a sales order detail with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the sales order detail.</param>
+        /// <returns>True if the sales order detail exists, otherwise false.</returns>
         private bool SalesOrderDetailExists(int id)
         {
             return _context.SalesOrderDetails.Any(e => e.SalesOrderId == id);

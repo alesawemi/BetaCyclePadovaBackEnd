@@ -24,14 +24,21 @@ namespace BetaCycle_Padova.Controllers.Users
 
         private static Logger CredentialNlogLogger = LogManager.GetCurrentClassLogger();
 
-        // GET: api/Credentials
+        /// <summary>
+        /// Retrieves all credentials.
+        /// </summary>
+        /// <returns>A list of credentials.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Credential>>> GetCredentials()
         {
             return await _context.Credentials.ToListAsync();
         }
 
-        // GET: api/Credentials/5
+        /// <summary>
+        /// Retrieves a specific credential by ID.
+        /// </summary>
+        /// <param name="id">The ID of the credential.</param>
+        /// <returns>The credential with the specified ID.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Credential>> GetCredential(int id)
         {
@@ -45,7 +52,11 @@ namespace BetaCycle_Padova.Controllers.Users
             return credential;
         }
 
-        //nuovo controller x ricerca credential nel db in base a db user 
+        /// <summary>
+        /// Retrieves a credential by the user ID.
+        /// </summary>
+        /// <param name="userId">The user ID to filter by.</param>
+        /// <returns>The credential associated with the specified user ID.</returns>
         [HttpGet("userId/{userId}")]
         public async Task<ActionResult<Credential>> GetCredentialByUserId(int userId)
         {
@@ -56,13 +67,17 @@ namespace BetaCycle_Padova.Controllers.Users
                 CredentialNlogLogger.Info("CredentialController - GetCredentialByUserId - NotFound");
                 return NotFound();
             }
-            
+
             CredentialNlogLogger.Info("CredentialController - GetCredentialByUserId - Ok");
             return credentials;
         }
 
-        // PUT: api/Credentials/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Updates a specific credential.
+        /// </summary>
+        /// <param name="id">The ID of the credential to update.</param>
+        /// <param name="credential">The updated credential.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCredential(int id, Credential credential)
         {
@@ -92,20 +107,18 @@ namespace BetaCycle_Padova.Controllers.Users
             return NoContent();
         }
 
-        // POST: api/Credentials
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Creates a new credential.
+        /// </summary>
+        /// <param name="credential">The credential to create.</param>
+        /// <returns>The created credential.</returns>
         [HttpPost]
         public async Task<ActionResult<Credential>> PostCredential(Credential credential)
         {
-            
-
-            //_LT2019context.Credentials.Add(credential);
             try
             {
-                
-
                 _context.Credentials.Add(credential);
-                await _context.SaveChangesAsync();             
+                await _context.SaveChangesAsync();
 
                 return CreatedAtAction("GetCredential", new { id = credential.Id }, credential);
             }
@@ -120,12 +133,13 @@ namespace BetaCycle_Padova.Controllers.Users
                     throw;
                 }
             }
-            
-
-           // return CreatedAtAction("GetCredential", new { id = credential.Id }, credential);
         }
 
-        // DELETE: api/Credentials/5
+        /// <summary>
+        /// Deletes a specific credential.
+        /// </summary>
+        /// <param name="id">The ID of the credential to delete.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCredential(int id)
         {
@@ -141,6 +155,11 @@ namespace BetaCycle_Padova.Controllers.Users
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a credential exists.
+        /// </summary>
+        /// <param name="id">The ID of the credential to check.</param>
+        /// <returns>True if the credential exists, false otherwise.</returns>
         private bool CredentialExists(int id)
         {
             return _context.Credentials.Any(e => e.Id == id);

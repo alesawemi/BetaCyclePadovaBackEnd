@@ -9,16 +9,16 @@ using System.Text.RegularExpressions;
 namespace BetaCycle_Padova.BLogic.Authentication.Basic
 {
     /// <summary>
-    /// Gestore dell'autenticazione basica.
+    /// Basic authentication handler.
     /// </summary>
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         /// <summary>
-        /// Inizializza una nuova istanza della classe <see cref="BasicAuthenticationHandler"/>.
+        /// Initializes a new instance of the <see cref="BasicAuthenticationHandler"/> class.
         /// </summary>
-        /// <param name="options">Monitor delle opzioni per lo schema di autenticazione.</param>
-        /// <param name="logger">Factory per il logger.</param>
-        /// <param name="encoder">Encoder per l'URL.</param>
+        /// <param name="options">Options monitor for the authentication scheme.</param>
+        /// <param name="logger">Logger factory.</param>
+        /// <param name="encoder">URL encoder.</param>
         public BasicAuthenticationHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
@@ -29,68 +29,68 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
         }
 
         /// <summary>
-        /// Logger per l'autenticazione basica.
+        /// Logger for basic authentication.
         /// </summary>
         private static Logger BasicNlogLogger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// Esegue l'autenticazione basica.
+        /// Executes basic authentication.
         /// </summary>
-        /// <returns>Il risultato dell'autenticazione.</returns>
+        /// <returns>The result of the authentication.</returns>
         /// <remarks>
-        /// <para>Ogni messaggio è composto da uno o più headers (intestazioni del messaggio).</para>
-        /// <para>Questo è il motore che ci permette di fare l'autenticazione basica.</para>
-        /// <para>Ti avviso, tu chiamante, che ho bisogno di un'autenticazione basic.</para>
+        /// <para>Each message consists of one or more headers.</para>
+        /// <para>This is the engine that allows us to perform basic authentication.</para>
+        /// <para>Let me warn you, caller, that I need basic authentication.</para>
         /// </remarks>
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            // Ogni messaggio è composto da uno o più headers (intestazioni del messaggio)
-            // Ti avviso tu chiamante che ho bisogno di un'autenticazione basic
+            // Each message consists of one or more headers.
+            // Let me warn you, caller, that I need basic authentication.
             Response.Headers.Add("WWW-Authenticate", "Basic");
 
-            // Dall'intestazione che hai nella chiamata cercami un "Authorization"
-            if (!Request.Headers.ContainsKey("Authorization")) //--DA RISOLVERE IN FUTURO
+            // From the header in the call, look for an "Authorization".
+            if (!Request.Headers.ContainsKey("Authorization")) //--TO BE RESOLVED IN THE FUTURE
             {
                 BasicNlogLogger.Warn("Basic Authentication Handler - Missing Authorization");
-                return Task.FromResult(AuthenticateResult.Fail("Missing Authorization")); // se non ti trovo - esci fuori subito
-            } // else vai avanti
+                return Task.FromResult(AuthenticateResult.Fail("Missing Authorization")); // if not found - exit immediately
+            } // else continue
 
             var authorizationHeader = Request.Headers["Authorization"].ToString();
-            var authorHeaderRegEx = new Regex("Basic (.*)"); // nella stringa che mi hai scaricato, dovrebbe iniziare con Basic 'spazio' qualcosa
+            var authorHeaderRegEx = new Regex("Basic (.*)"); // in the string you provided, it should start with Basic 'space' something
 
-            if (!authorHeaderRegEx.IsMatch(authorizationHeader)) // se la regex non corrisponde con quanto trovato
+            if (!authorHeaderRegEx.IsMatch(authorizationHeader)) // if the regex does not match what was found
             {
                 BasicNlogLogger.Warn("Basic Authentication Handler - Invalid Authorization");
-                return Task.FromResult(AuthenticateResult.Fail("Invalid Authorization")); // esce fuori
+                return Task.FromResult(AuthenticateResult.Fail("Invalid Authorization")); // exit
             }
 
-            // BASIC AUTHENTICATION ENCODING-64 - della stringa che corrisponde a (.*)
+            // BASIC AUTHENTICATION ENCODING-64 - of the string that matches (.*)
             var auth64 = Encoding.UTF8.GetString(
                 Convert.FromBase64String(authorHeaderRegEx
                 .Replace(authorizationHeader, "$1")));
 
-            // Se l'encoding è stato eseguito correttamente ci dovrebbe essere "nomeutente:password", ma se io ho due elementi
-            // è un array
-            var authArraySplit = auth64.Split(Convert.ToChar(":"), 2); // array fatto da due elementi,  [0]: username, [1]: password
+            // If the encoding was done correctly there should be "username:password", but if I have two elements
+            // it's an array
+            var authArraySplit = auth64.Split(Convert.ToChar(":"), 2); // array made of two elements,  [0]: username, [1]: password
             var authUser = authArraySplit[0];
-            // non è detto che la password me l'abbia presa, quindi faccio un controllo in più.
-            var authPassword = authArraySplit.Length > 1 ? authArraySplit[1] : throw new Exception("Password NON presente");
+            // it is not certain that the password was taken, so I do an extra check.
+            var authPassword = authArraySplit.Length > 1 ? authArraySplit[1] : throw new Exception("Password NOT present");
 
-            // Se va tutto bene ho username e password - qui inizia il lavoro dietro le quinte da implementare
-            if ((string.IsNullOrEmpty(authUser)) || (string.IsNullOrEmpty(authPassword.Trim()))) // Trim butta via gli spazi non significativi
+            // If all goes well, I have username and password - here begins the behind-the-scenes work to be implemented
+            if ((string.IsNullOrEmpty(authUser)) || (string.IsNullOrEmpty(authPassword.Trim()))) // Trim removes insignificant spaces
             {
-                BasicNlogLogger.Warn("Basic Authentication Handler - Username e/o Password NON validi");
-                return Task.FromResult(AuthenticateResult.Fail("Username e/o Password NON validi"));
+                BasicNlogLogger.Warn("Basic Authentication Handler - Invalid Username and/or Password");
+                return Task.FromResult(AuthenticateResult.Fail("Invalid Username and/or Password"));
             }
             else
             {
-                // Ottieni l'email dall'autorizzazione di base
-                var authenticatedUser = new AuthenticatedUser("BasicAuthentication", true, authArraySplit[0].ToString()); // devi definire nuova classe AuthenticatedUser
+                // Get the email from basic authorization
+                var authenticatedUser = new AuthenticatedUser("BasicAuthentication", true, authArraySplit[0].ToString()); // you need to define new AuthenticatedUser class
 
-                // framework definisce entità che permetterà all'utente di entrare
+                // framework defines entity that will allow the user to enter
                 var claimsMain = new ClaimsPrincipal(new ClaimsIdentity(authenticatedUser));
 
-                BasicNlogLogger.Info("Basic Authentication Handler ha autorizzato l'operazione");
+                BasicNlogLogger.Info("Basic Authentication Handler authorized the operation");
                 return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(claimsMain, Scheme.Name)));
             }
         }

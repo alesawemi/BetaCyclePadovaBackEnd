@@ -21,6 +21,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all product models.
+        /// </summary>
+        /// <returns>A list of product models.</returns>
         // GET: api/ProductModels
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductModel>>> GetProductModels()
@@ -28,6 +32,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return await _context.ProductModels.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a specific product model by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product model.</param>
+        /// <returns>The product model with the specified ID.</returns>
         // GET: api/ProductModels/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductModel>> GetProductModel(int id)
@@ -42,8 +51,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return productModel;
         }
 
+        /// <summary>
+        /// Updates a specific product model by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product model to update.</param>
+        /// <param name="productModel">The updated product model object.</param>
+        /// <returns>No content if the update is successful.</returns>
         // PUT: api/ProductModels/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProductModel(int id, ProductModel productModel)
         {
@@ -73,8 +87,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Adds a new product model.
+        /// </summary>
+        /// <param name="productModel">The product model to add.</param>
+        /// <returns>The newly created product model.</returns>
         // POST: api/ProductModels
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<ProductModel>> PostProductModel(ProductModel productModel)
         {
@@ -84,6 +102,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetProductModel", new { id = productModel.ProductModelId }, productModel);
         }
 
+        /// <summary>
+        /// Deletes a specific product model by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product model to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         // DELETE: api/ProductModels/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductModel(int id)
@@ -100,6 +123,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a product model with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the product model.</param>
+        /// <returns>True if the product model exists, otherwise false.</returns>
         private bool ProductModelExists(int id)
         {
             return _context.ProductModels.Any(e => e.ProductModelId == id);

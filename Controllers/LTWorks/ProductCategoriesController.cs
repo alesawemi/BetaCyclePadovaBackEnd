@@ -21,6 +21,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all product categories.
+        /// </summary>
+        /// <returns>A list of product categories.</returns>
         // GET: api/ProductCategories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductCategory>>> GetProductCategories()
@@ -28,6 +32,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return await _context.ProductCategories.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a specific product category by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product category.</param>
+        /// <returns>The product category with the specified ID.</returns>
         // GET: api/ProductCategories/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductCategory>> GetProductCategory(int id)
@@ -42,8 +51,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return productCategory;
         }
 
+        /// <summary>
+        /// Updates a specific product category by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product category to update.</param>
+        /// <param name="productCategory">The updated product category object.</param>
+        /// <returns>No content if the update is successful.</returns>
         // PUT: api/ProductCategories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProductCategory(int id, ProductCategory productCategory)
         {
@@ -73,8 +87,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Adds a new product category.
+        /// </summary>
+        /// <param name="productCategory">The product category to add.</param>
+        /// <returns>The newly created product category.</returns>
         // POST: api/ProductCategories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<ProductCategory>> PostProductCategory(ProductCategory productCategory)
         {
@@ -84,6 +102,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetProductCategory", new { id = productCategory.ProductCategoryId }, productCategory);
         }
 
+        /// <summary>
+        /// Deletes a specific product category by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product category to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         // DELETE: api/ProductCategories/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductCategory(int id)
@@ -100,6 +123,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a product category with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the product category.</param>
+        /// <returns>True if the product category exists, otherwise false.</returns>
         private bool ProductCategoryExists(int id)
         {
             return _context.ProductCategories.Any(e => e.ProductCategoryId == id);

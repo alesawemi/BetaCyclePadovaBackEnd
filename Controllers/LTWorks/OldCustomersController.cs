@@ -24,6 +24,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         private static Logger CustomerNlogLogger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Retrieves all customers.
+        /// </summary>
+        /// <returns>A list of customers.</returns>
         // GET: api/OldCustomers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
@@ -31,6 +35,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return await _context.Customers.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a specific customer by ID.
+        /// </summary>
+        /// <param name="id">The ID of the customer.</param>
+        /// <returns>The customer with the specified ID.</returns>
         // GET: api/OldCustomers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
@@ -45,7 +54,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return customer;
         }
 
-
+        /// <summary>
+        /// Retrieves a specific customer by email address.
+        /// </summary>
+        /// <param name="emailAddress">The email address of the customer.</param>
+        /// <returns>The customer with the specified email address.</returns>
         [HttpGet("email/{emailAddress}")]
         public async Task<ActionResult<Customer>> GetCustomerByEmail(string emailAddress)
         {
@@ -61,10 +74,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return customer;
         }
 
-
-
+        /// <summary>
+        /// Updates a specific customer by ID.
+        /// </summary>
+        /// <param name="id">The ID of the customer to update.</param>
+        /// <param name="customer">The updated customer object.</param>
+        /// <returns>No content if the update is successful.</returns>
         // PUT: api/OldCustomers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
@@ -94,10 +110,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Adds a new customer.
+        /// </summary>
+        /// <param name="customer">The customer to add.</param>
+        /// <returns>The newly created customer.</returns>
         // POST: api/OldCustomers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-
-        //03-05-2024: DA USARE PER LA REGISTRAZIONE
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
@@ -107,6 +125,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
         }
 
+        /// <summary>
+        /// Deletes a specific customer by ID.
+        /// </summary>
+        /// <param name="id">The ID of the customer to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         // DELETE: api/OldCustomers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
@@ -123,10 +146,14 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a customer with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the customer.</param>
+        /// <returns>True if the customer exists, otherwise false.</returns>
         private bool CustomerExists(int id)
         {
             return _context.Customers.Any(e => e.CustomerId == id);
         }
     }
 }
-// test git 333

@@ -11,6 +11,9 @@ using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks
 {
+    /// <summary>
+    /// Controller for handling addresses.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AddressesController : ControllerBase
@@ -26,6 +29,9 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // GET: api/Addresses
         [HttpGet]
+        /// <summary>
+        /// Retrieves all addresses.
+        /// </summary>
         public async Task<ActionResult<IEnumerable<Address>>> GetAddresses()
         {
             return await _context.Addresses.ToListAsync();
@@ -33,6 +39,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // GET: api/Addresses/5
         [HttpGet("{id}")]
+        /// <summary>
+        /// Retrieves an address by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the address to retrieve.</param>
         public async Task<ActionResult<Address>> GetAddress(int id)
         {
             var address = await _context.Addresses.FindAsync(id);
@@ -48,8 +58,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         // PUT: api/Addresses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        /// <summary>
+        /// Updates an existing address.
+        /// </summary>
+        /// <param name="id">The ID of the address to update.</param>
+        /// <param name="address">The updated address data.</param>
         public async Task<IActionResult> PutAddress(int id, Address address)
-        {            
+        {
             if (id != address.AddressId)
             {
                 return BadRequest();
@@ -77,8 +92,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         }
 
         // PUT: api/Addresses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("FrontEnd/{adrsId}")]
+        /// <summary>
+        /// Updates an address from the frontend.
+        /// </summary>
+        /// <param name="adrsId">The ID of the address to update.</param>
+        /// <param name="address">The updated address data.</param>
         public async Task<IActionResult> PutAddressFrontEnd(int adrsId, Address address)
         {
             AddressNlogLogger.Info("AddressesController - PutAddressFrontEnd");
@@ -89,7 +108,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 return BadRequest();
             }
 
-            // Trova l'entità esistente nel database
+            // Find the existing entity in the database
             var existingAddress = await _context.Addresses.FirstOrDefaultAsync(a => a.AddressId == adrsId);
 
             if (existingAddress == null)
@@ -127,8 +146,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         }
 
         // POST: api/Addresses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        /// <summary>
+        /// Creates a new address.
+        /// </summary>
+        /// <param name="address">The address data to create.</param>
         public async Task<ActionResult<Address>> PostAddress(Address address)
         {
             _context.Addresses.Add(address);
@@ -139,6 +161,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // DELETE: api/Addresses/5
         [HttpDelete("{id}")]
+        /// <summary>
+        /// Deletes an address by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the address to delete.</param>
         public async Task<IActionResult> DeleteAddress(int id)
         {
             var address = await _context.Addresses.FindAsync(id);

@@ -11,12 +11,14 @@ using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks
 {
+    /// <summary>
+    /// Controller for managing customer addresses.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerAddressesController : ControllerBase
     {
         private readonly AdventureWorksLt2019Context _LT2019context;
-
         private readonly BetacycleUsersContext _usersContext;
 
         public CustomerAddressesController(AdventureWorksLt2019Context LTcontext, BetacycleUsersContext usersContext)
@@ -29,6 +31,9 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // GET: api/CustomerAddresses
         [HttpGet]
+        /// <summary>
+        /// Retrieves all customer addresses.
+        /// </summary>
         public async Task<ActionResult<IEnumerable<CustomerAddress>>> GetCustomerAddresses()
         {
             return await _LT2019context.CustomerAddresses.ToListAsync();
@@ -36,6 +41,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // GET: api/CustomerAddresses/5
         [HttpGet("{id}")]
+        /// <summary>
+        /// Retrieves a customer address by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the customer address to retrieve.</param>
         public async Task<ActionResult<CustomerAddress>> GetCustomerAddress(int id)
         {
             var customerAddress = await _LT2019context.CustomerAddresses.FindAsync(id);
@@ -50,9 +59,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // GET: api/CustomerAddresses/Customer/'n'
         [HttpGet("Customer/{custId}")]
+        /// <summary>
+        /// Retrieves a customer address by customer ID.
+        /// </summary>
+        /// <param name="custId">The ID of the customer.</param>
         public async Task<ActionResult<CustomerAddressFrontEnd>> GetCustomerAddressByCustId(int custId)
         {
-            //faccio una ricerca per CustomerId
             var customerAddress = await _LT2019context.CustomerAddresses.FirstOrDefaultAsync(c => c.CustomerId == custId);
 
             if (customerAddress == null)
@@ -74,9 +86,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
         // GET: api/CustomerAddresses/Address/'n'
         [HttpGet("Address/{adrsId}")]
+        /// <summary>
+        /// Retrieves a customer address by its address ID.
+        /// </summary>
+        /// <param name="adrsId">The ID of the address.</param>
         public async Task<ActionResult<CustomerAddressFrontEnd>> GetCustomerAddressByAdrsId(int adrsId)
         {
-            //Faccio una ricerca per AddressId
             var customerAddress = await _LT2019context.CustomerAddresses.FirstOrDefaultAsync(a => a.AddressId == adrsId);
 
             if (customerAddress == null)
@@ -96,10 +111,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return customerAddressFE;
         }
 
-
         // PUT: api/CustomerAddresses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        /// <summary>
+        /// Updates a customer address.
+        /// </summary>
+        /// <param name="id">The ID of the customer address to update.</param>
+        /// <param name="customerAddress">The updated customer address data.</param>
         public async Task<IActionResult> PutCustomerAddress(int id, CustomerAddress customerAddress)
         {
             if (id != customerAddress.CustomerId)
@@ -129,10 +147,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
-
         // PUT: api/CustomerAddresses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("Customer/{custId}")]
+        /// <summary>
+        /// Updates a customer address by customer ID.
+        /// </summary>
+        /// <param name="custId">The ID of the customer.</param>
+        /// <param name="customerAddressFE">The updated customer address data.</param>
         public async Task<IActionResult> PutCustomerAddressByCustId(int custId, CustomerAddressFrontEnd customerAddressFE)
         {
             if (custId != customerAddressFE.CustomerId)
@@ -140,10 +161,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 return BadRequest();
             }
 
-            // Verifica se il CustomerId esiste nella tabella Customers del vecchio database
             var customerExistsInOldDb = await _LT2019context.Customers.AnyAsync(c => c.CustomerId == customerAddressFE.CustomerId);
 
-            // Se il CustomerId non esiste nella tabella Customers, verifica se esiste nella tabella Users del nuovo database
             if (!customerExistsInOldDb)
             {
                 var userExistsInNewDb = await _usersContext.Users.AnyAsync(u => u.Id == customerAddressFE.CustomerId);
@@ -154,7 +173,6 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 }
             }
 
-            // Trova l'entità esistente nel database
             var customerAddress = await _LT2019context.CustomerAddresses
                                                 .FirstOrDefaultAsync(ca => ca.CustomerId == custId);
 
@@ -163,14 +181,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
                 return NotFound();
             }
 
-            // Aggiorna solo i campi specifici
-            // customerAddress.AddressId = customerAddressFE.AddressId; // Questo è commentato, come nell'originale
             customerAddress.AddressType = customerAddressFE.AddressType;
             customerAddress.ModifiedDate = DateTime.Now;
 
             try
             {
-                // Salva i cambiamenti nel database
                 await _LT2019context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -189,8 +204,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         }
 
         // POST: api/CustomerAddresses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        /// <summary>
+        /// Creates a new customer address.
+        /// </summary>
+        /// <param name="customerAddress">The customer address to add.</param>
         public async Task<ActionResult<CustomerAddress>> PostCustomerAddress(CustomerAddress customerAddress)
         {
             _LT2019context.CustomerAddresses.Add(customerAddress);
@@ -214,14 +232,15 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         }
 
         // POST: api/CustomerAddresses/FrontEnd
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("FrontEnd")]
+        /// <summary>
+        /// Creates a new customer address from front-end data.
+        /// </summary>
+        /// <param name="customerAddressFE">The customer address data from the front end.</param>
         public async Task<ActionResult<CustomerAddress>> PostCustomerAddressFrontEnd(CustomerAddressFrontEnd customerAddressFE)
         {
-            // Verifica se il CustomerId esiste nella tabella Customers del vecchio database
             var customerExistsInOldDb = await _LT2019context.Customers.AnyAsync(c => c.CustomerId == customerAddressFE.CustomerId);
 
-            // Se il CustomerId non esiste nella tabella Customers, verifica se esiste nella tabella Users del nuovo database
             if (!customerExistsInOldDb)
             {
                 var userExistsInNewDb = await _usersContext.Users.AnyAsync(u => u.Id == customerAddressFE.CustomerId);
@@ -259,10 +278,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetCustomerAddress", new { id = customerAddress.CustomerId }, customerAddress);
         }
 
-
-
         // DELETE: api/CustomerAddresses/5
         [HttpDelete("{id}")]
+        /// <summary>
+        /// Deletes a customer address by ID.
+        /// </summary>
+        /// <param name="id">The ID of the customer address to delete.</param>
         public async Task<IActionResult> DeleteCustomerAddress(int id)
         {
             var customerAddress = await _LT2019context.CustomerAddresses.FindAsync(id);
@@ -277,10 +298,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
-
         private bool CustomerAddressExists(int id)
         {
             return _LT2019context.CustomerAddresses.Any(e => e.CustomerId == id);
         }
     }
 }
+

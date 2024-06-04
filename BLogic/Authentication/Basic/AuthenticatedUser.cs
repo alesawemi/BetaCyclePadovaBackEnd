@@ -3,16 +3,16 @@
 namespace BetaCycle_Padova.BLogic.Authentication.Basic
 {
     /// <summary>
-    /// Rappresenta un utente autenticato.
+    /// Represents an authenticated user.
     /// </summary>
     public class AuthenticatedUser : IIdentity
     {
         /// <summary>
-        /// Inizializza una nuova istanza della classe <see cref="AuthenticatedUser"/>.
+        /// Initializes a new instance of the <see cref="AuthenticatedUser"/> class.
         /// </summary>
-        /// <param name="authType">Il tipo di autenticazione utilizzato.</param>
-        /// <param name="isAuthenticated">Indica se l'utente è autenticato.</param>
-        /// <param name="name">Il nome dell'utente.</param>
+        /// <param name="authType">The type of authentication used.</param>
+        /// <param name="isAuthenticated">Indicates whether the user is authenticated.</param>
+        /// <param name="name">The name of the user.</param>
         public AuthenticatedUser(string authType, bool isAuthenticated, string name)
         {
             AuthenticationType = authType;
@@ -21,17 +21,17 @@ namespace BetaCycle_Padova.BLogic.Authentication.Basic
         }
 
         /// <summary>
-        /// Ottiene il tipo di autenticazione utilizzato.
+        /// Gets the type of authentication used.
         /// </summary>
         public string? AuthenticationType { get; set; }
 
         /// <summary>
-        /// Ottiene un valore che indica se l'utente è autenticato.
+        /// Gets a value indicating whether the user is authenticated.
         /// </summary>
         public bool IsAuthenticated { get; set; }
 
         /// <summary>
-        /// Ottiene il nome dell'utente.
+        /// Gets the name of the user.
         /// </summary>
         public string? Name { get; set; }
     }

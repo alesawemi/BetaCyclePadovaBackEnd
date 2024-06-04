@@ -13,18 +13,29 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
+    /// <summary>
+    /// API Controller for managing views of accessories.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AccessoriesViewsController : ControllerBase
     {
         private readonly AdventureWorksLt2019Context _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccessoriesViewsController"/> class.
+        /// </summary>
+        /// <param name="context">The database context.</param>
         public AccessoriesViewsController(AdventureWorksLt2019Context context)
         {
             _context = context;
         }
 
         // GET: api/AccessoriesViews
+        /// <summary>
+        /// Retrieves all accessories views.
+        /// </summary>
+        /// <returns>A list of accessories views.</returns>
         [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AccessoriesView>>> GetAccessoriesViews()
@@ -33,6 +44,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // GET: api/AccessoriesViews/5
+        /// <summary>
+        /// Retrieves a specific accessories view by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the accessories view to retrieve.</param>
+        /// <returns>The requested accessories view.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<AccessoriesView>> GetAccessoriesView(int id)
         {
@@ -48,6 +64,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
         // PUT: api/AccessoriesViews/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Updates an accessories view.
+        /// </summary>
+        /// <param name="id">The ID of the accessories view to update.</param>
+        /// <param name="accessoriesView">The updated accessories view.</param>
+        /// <returns>An action result indicating the outcome of the operation.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAccessoriesView(int id, AccessoriesView accessoriesView)
         {
@@ -79,6 +101,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
         // POST: api/AccessoriesViews
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Creates a new accessories view.
+        /// </summary>
+        /// <param name="accessoriesView">The accessories view to create.</param>
+        /// <returns>An action result indicating the outcome of the operation.</returns>
         [HttpPost]
         public async Task<ActionResult<AccessoriesView>> PostAccessoriesView(AccessoriesView accessoriesView)
         {
@@ -103,6 +130,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // DELETE: api/AccessoriesViews/5
+        /// <summary>
+        /// Deletes an accessories view.
+        /// </summary>
+        /// <param name="id">The ID of the accessories view to delete.</param>
+        /// <returns>An action result indicating the outcome of the operation.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAccessoriesView(int id)
         {
@@ -118,16 +150,22 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             return NoContent();
         }
 
-
+        // Additional methods...
 
         private bool AccessoriesViewExists(int id)
         {
             return _context.AccessoriesViews.Any(e => e.ProductId == id);
         }
 
-
+        // GET: api/AccessoriesViews/OrderByPriceAscending
+        // GET: api/AccessoriesViews/OrderByPriceDescending
+        // Additional methods...
 
         // GET: api/AccessoriesViews/OrderByPriceAscending
+        /// <summary>
+        /// Retrieves all accessories views ordered by price in ascending order.
+        /// </summary>
+        /// <returns>A list of accessories views ordered by price in ascending order.</returns>
         [HttpGet("OrderByPriceAscending")]
         public async Task<ActionResult<IEnumerable<AccessoriesView>>> GetAccessoriesViewsOrderByPriceAscending()
         {
@@ -138,6 +176,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // GET: api/AccessoriesViews/OrderByPriceDescending
+        /// <summary>
+        /// Retrieves all accessories views ordered by price in descending order.
+        /// </summary>
+        /// <returns>A list of accessories views ordered by price in descending order.</returns>
         [HttpGet("OrderByPriceDescending")]
         public async Task<ActionResult<IEnumerable<AccessoriesView>>> GetAccessoriesViewsOrderByPriceDescending()
         {

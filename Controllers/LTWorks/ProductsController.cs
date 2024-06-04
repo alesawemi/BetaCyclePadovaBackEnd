@@ -24,30 +24,31 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        //[BasicAuthorizationAttributes]
-        // GET: api/Products
+        /// <summary>
+        /// Retrieves all products.
+        /// </summary>
+        /// <returns>A list of products.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return await _context.Products.ToListAsync();
         }
 
-        // [Route("GetProductsByPage/{rowsPage}")]
+        /// <summary>
+        /// Retrieves products by pages.
+        /// </summary>
+        /// <returns>A list of products paginated.</returns>
         [Route("GetProductsByPage")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPage() //(int rowsPage) //rowsPage lo metto nell'app-settings, non lo passo io
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByPage()
         {
-            //posso direttamente sulla classe/oggetto del context eseguire delle query
             int lastId = 0;
-
-            int rowsPage = 12; //ti chiedo pacchetti da 12 alla volta, poi tu user restringi la ricerca - affino la ricerca.
+            int rowsPage = 12;
 
             var page = _context.Products.FromSql(
                 $"SELECT * FROM [AdventureWorksLT2019].[SalesLT].[Product]")
                 .OrderBy(ob => ob.Name)
                 .ThenBy(ob => ob.StandardCost)
-                //.OrderBy(ob =>  new { ob.Name, ob.StandardCost })
                 .Where(a => a.ProductId > lastId)
                 .Take(rowsPage)
                 .ToListAsync();
@@ -55,8 +56,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return await page;
         }
 
-
-        // GET: api/Products/5
+        /// <summary>
+        /// Retrieves a specific product by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product.</param>
+        /// <returns>The product with the specified ID.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
@@ -70,8 +74,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return product;
         }
 
-        // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Updates a specific product by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product to update.</param>
+        /// <param name="product">The updated product object.</param>
+        /// <returns>No content if the update is successful.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, Product product)
         {
@@ -101,8 +109,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
-        // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Adds a new product.
+        /// </summary>
+        /// <param name="product">The product to add.</param>
+        /// <returns>The newly created product.</returns>
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
@@ -112,7 +123,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
         }
 
-        // DELETE: api/Products/5
+        /// <summary>
+        /// Deletes a specific product by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -128,6 +143,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a product with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the product.</param>
+        /// <returns>True if the product exists, otherwise false.</returns>
         private bool ProductExists(int id)
         {
             return _context.Products.Any(e => e.ProductId == id);

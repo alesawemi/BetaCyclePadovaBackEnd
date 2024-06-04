@@ -10,18 +10,28 @@ using BetaCycle_Padova.Models.LTWorks.Views;
 
 namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
+    /// <summary>
+    /// API Controller for managing views of components.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ComponentsViewsController : ControllerBase
     {
         private readonly AdventureWorksLt2019Context _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ComponentsViewsController"/> class.
+        /// </summary>
+        /// <param name="context">The database context.</param>
         public ComponentsViewsController(AdventureWorksLt2019Context context)
         {
             _context = context;
         }
 
         // GET: api/ComponentsViews
+        /// <summary>
+        /// Retrieves all components views.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ComponentsView>>> GetComponentsViews()
         {
@@ -29,6 +39,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // GET: api/ComponentsViews/5
+        /// <summary>
+        /// Retrieves a specific components view by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the components view to retrieve.</param>
         [HttpGet("{id}")]
         public async Task<ActionResult<ComponentsView>> GetComponentsView(int id)
         {
@@ -44,6 +58,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
         // PUT: api/ComponentsViews/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Updates a components view.
+        /// </summary>
+        /// <param name="id">The ID of the components view to update.</param>
+        /// <param name="componentsView">The updated components view.</param>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutComponentsView(int id, ComponentsView componentsView)
         {
@@ -75,6 +94,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
         // POST: api/ComponentsViews
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Creates a new components view.
+        /// </summary>
+        /// <param name="componentsView">The components view to create.</param>
         [HttpPost]
         public async Task<ActionResult<ComponentsView>> PostComponentsView(ComponentsView componentsView)
         {
@@ -99,6 +122,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // DELETE: api/ComponentsViews/5
+        /// <summary>
+        /// Deletes a components view.
+        /// </summary>
+        /// <param name="id">The ID of the components view to delete.</param>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComponentsView(int id)
         {
@@ -120,6 +147,9 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // GET: api/ComponentsViews/OrderByPriceAscending
+        /// <summary>
+        /// Retrieves all components views ordered by price in ascending order.
+        /// </summary>
         [HttpGet("OrderByPriceAscending")]
         public async Task<ActionResult<IEnumerable<ComponentsView>>> GetComponentsViewsOrderByPriceAscending()
         {
@@ -130,6 +160,9 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         }
 
         // GET: api/ComponentsViews/OrderByPriceDescending
+        /// <summary>
+        /// Retrieves all components views ordered by price in descending order.
+        /// </summary>
         [HttpGet("OrderByPriceDescending")]
         public async Task<ActionResult<IEnumerable<ComponentsView>>> GetComponentsViewsOrderByPriceDescending()
         {

@@ -21,6 +21,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all product descriptions.
+        /// </summary>
+        /// <returns>A list of product descriptions.</returns>
         // GET: api/ProductDescriptions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDescription>>> GetProductDescriptions()
@@ -28,6 +32,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return await _context.ProductDescriptions.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a specific product description by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product description.</param>
+        /// <returns>The product description with the specified ID.</returns>
         // GET: api/ProductDescriptions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDescription>> GetProductDescription(int id)
@@ -42,8 +51,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return productDescription;
         }
 
+        /// <summary>
+        /// Updates a specific product description by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product description to update.</param>
+        /// <param name="productDescription">The updated product description object.</param>
+        /// <returns>No content if the update is successful.</returns>
         // PUT: api/ProductDescriptions/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProductDescription(int id, ProductDescription productDescription)
         {
@@ -73,8 +87,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Adds a new product description.
+        /// </summary>
+        /// <param name="productDescription">The product description to add.</param>
+        /// <returns>The newly created product description.</returns>
         // POST: api/ProductDescriptions
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<ProductDescription>> PostProductDescription(ProductDescription productDescription)
         {
@@ -84,6 +102,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetProductDescription", new { id = productDescription.ProductDescriptionId }, productDescription);
         }
 
+        /// <summary>
+        /// Deletes a specific product description by ID.
+        /// </summary>
+        /// <param name="id">The ID of the product description to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         // DELETE: api/ProductDescriptions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProductDescription(int id)
@@ -100,6 +123,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a product description with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the product description.</param>
+        /// <returns>True if the product description exists, otherwise false.</returns>
         private bool ProductDescriptionExists(int id)
         {
             return _context.ProductDescriptions.Any(e => e.ProductDescriptionId == id);

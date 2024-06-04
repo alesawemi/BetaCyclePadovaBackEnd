@@ -21,14 +21,21 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
-        // GET: api/SalesOrderHeaders
+        /// <summary>
+        /// Retrieves all sales order headers.
+        /// </summary>
+        /// <returns>A list of sales order headers.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SalesOrderHeader>>> GetSalesOrderHeaders()
         {
             return await _context.SalesOrderHeaders.ToListAsync();
         }
 
-        // GET: api/SalesOrderHeaders/5
+        /// <summary>
+        /// Retrieves a specific sales order header by ID.
+        /// </summary>
+        /// <param name="id">The ID of the sales order header.</param>
+        /// <returns>The sales order header with the specified ID.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<SalesOrderHeader>> GetSalesOrderHeader(int id)
         {
@@ -42,8 +49,12 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return salesOrderHeader;
         }
 
-        // PUT: api/SalesOrderHeaders/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Updates a specific sales order header by ID.
+        /// </summary>
+        /// <param name="id">The ID of the sales order header to update.</param>
+        /// <param name="salesOrderHeader">The updated sales order header object.</param>
+        /// <returns>No content if the update is successful.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSalesOrderHeader(int id, SalesOrderHeader salesOrderHeader)
         {
@@ -73,8 +84,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
-        // POST: api/SalesOrderHeaders
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Adds a new sales order header.
+        /// </summary>
+        /// <param name="salesOrderHeader">The sales order header to add.</param>
+        /// <returns>The newly created sales order header.</returns>
         [HttpPost]
         public async Task<ActionResult<SalesOrderHeader>> PostSalesOrderHeader(SalesOrderHeader salesOrderHeader)
         {
@@ -84,7 +98,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return CreatedAtAction("GetSalesOrderHeader", new { id = salesOrderHeader.SalesOrderId }, salesOrderHeader);
         }
 
-        // DELETE: api/SalesOrderHeaders/5
+        /// <summary>
+        /// Deletes a specific sales order header by ID.
+        /// </summary>
+        /// <param name="id">The ID of the sales order header to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSalesOrderHeader(int id)
         {
@@ -100,6 +118,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks if a sales order header with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the sales order header.</param>
+        /// <returns>True if the sales order header exists, otherwise false.</returns>
         private bool SalesOrderHeaderExists(int id)
         {
             return _context.SalesOrderHeaders.Any(e => e.SalesOrderId == id);

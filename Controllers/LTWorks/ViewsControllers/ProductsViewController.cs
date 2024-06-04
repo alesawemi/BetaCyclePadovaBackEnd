@@ -17,6 +17,9 @@ using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 {
+    /// <summary>
+    /// Controller for handling product views.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsViewController : ControllerBase
@@ -30,6 +33,10 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
         private static Logger ProductsViewNlogLogger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Retrieves products matching the given parameter from the view.
+        /// </summary>
+        /// <param name="param">The search parameter.</param>
         [HttpGet("GetByParam/{param}")]
         public async Task<ActionResult<IEnumerable<ProductsView>>> GetByParam(string param)
         {
@@ -48,16 +55,11 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             }
             catch (Exception ex)
             {
-                ProductsViewNlogLogger.Error("Products View Controller - Eccezione sollevata da " +
+                ProductsViewNlogLogger.Error("Products View Controller - Exception thrown from " +
                     "GetByParam");
 
-                return BadRequest(new { message = "Eccezione sollevata da GetByParam in Products View Controller." });
+                return BadRequest(new { message = "Exception thrown from GetByParam in Products View Controller." });
             }
-            
-            
         }
-
-
-        
     }
 }
