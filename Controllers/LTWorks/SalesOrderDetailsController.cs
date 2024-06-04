@@ -117,6 +117,57 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         /// </summary>
         /// <param name="id">The ID of the sales order detail to delete.</param>
         /// <returns>No content if the deletion is successful.</returns>
+
+        [HttpPost("FrontEnd")]
+        public async Task<ActionResult<SalesOrderDetail>> PostSalesOrderDetailFE(List<SalesOrderDetailFE> salesOrderDetailFE)
+        {
+
+
+            Console.WriteLine("Sei dentro Sales Order Header");
+            try
+            {           
+               
+                List<SalesOrderDetail> salesOrderDetail = [];
+                foreach (var detailFE in salesOrderDetailFE)
+                {
+                    SalesOrderDetail detail = new SalesOrderDetail
+                    {
+                        SalesOrderId = detailFE.SalesOrderId,
+                        SalesOrderDetailId = detailFE.SalesOrderDetailId,
+                        OrderQty = detailFE.OrderQty,
+                        ProductId = detailFE.ProductId,
+                        UnitPrice = detailFE.UnitPrice,
+                        UnitPriceDiscount = detailFE.UnitPriceDiscount,
+                        LineTotal = detailFE.LineTotal
+                    };
+                    salesOrderDetail.Add(detail);
+                }
+
+
+                // Debugging log for details
+                Console.WriteLine($"Number of SalesOrderDetails to add: {salesOrderDetail.Count}");
+
+                //e poi aggiungere al database
+                foreach (SalesOrderDetail detail in salesOrderDetail)
+                {
+                    Console.WriteLine($"Detail - SalesOrderId: {detail.SalesOrderId}, ProductId: {detail.ProductId}, OrderQty: {detail.OrderQty}");
+
+                    _context.SalesOrderDetails.Add(detail);
+                }
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest();
+            }
+
+            
+        }
+
+
+        // DELETE: api/SalesOrderDetails/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSalesOrderDetail(int id)
         {
