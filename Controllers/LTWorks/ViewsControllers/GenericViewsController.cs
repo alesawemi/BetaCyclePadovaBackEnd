@@ -178,7 +178,6 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
 
 
         [Route("GetWithFilters")]
-        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<IEnumerable<GenericView>>> GetWithFiltersFromView([FromQuery] string view,
             ProductFilters Filters)
