@@ -65,7 +65,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             }
             catch (Exception ex) 
             {
-                GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
+                GenericViewNlogLogger.Error(ex, "Generic Views Controller - Eccezione sollevata da " +
                     $"GetAllItemsFromView {ViewName}");
 
                 return BadRequest(new { message = "Eccezione sollevata da GetAllItemsFromView in GenericViewsController." });
@@ -167,7 +167,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             }
             catch (Exception ex)
             {
-                GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
+                GenericViewNlogLogger.Error(ex, "Generic Views Controller - Eccezione sollevata da " +
                     $"GetProductPropertiesFromView {ViewName}");
                 Console.WriteLine(ex);
             }
@@ -372,7 +372,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             }
             catch (Exception ex) 
             {
-                GenericViewNlogLogger.Error("Generic Views Controller - Eccezione sollevata da " +
+                GenericViewNlogLogger.Error(ex, "Generic Views Controller - Eccezione sollevata da " +
                     $"GetWithFiltersFromView {ViewName}");
 
                 return BadRequest(new { message = "Eccezione sollevata da GetWithFiltersFromView in GenericViewsController." });

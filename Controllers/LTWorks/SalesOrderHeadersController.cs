@@ -22,6 +22,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             _context = context;
         }
 
+        private static Logger OrderHeaderNlogLogger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Retrieves all sales order headers.
         /// </summary>
@@ -124,7 +126,7 @@ namespace BetaCycle_Padova.Controllers.LTWorks
             Console.WriteLine("Sei dentro Sales Order Header");
             try
             {
-
+                OrderHeaderNlogLogger.Info("Sales Order Header Controller - Post Front End");
                 SalesOrderHeader salesOrderHeader = new()
                 {
                     SalesOrderId = salesOrderHeaderFE.SalesOrderId,
@@ -190,11 +192,13 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             catch (DbUpdateException ex) {
                 Console.WriteLine(ex);
+                OrderHeaderNlogLogger.Error(ex, "Sales Order Header Controller - Post Front End");
                 return BadRequest(new { message = "an exception occured in the DB! " });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+                OrderHeaderNlogLogger.Error(ex, "Sales Order Header Controller - Post Front End");
                 return BadRequest(new { message = "an exception occured in the backend! " });
             }
 

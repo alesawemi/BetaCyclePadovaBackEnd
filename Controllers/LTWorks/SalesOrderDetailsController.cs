@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BetaCycle_Padova.Controllers.Context;
 using BetaCycle_Padova.Models.LTWorks;
+using NLog;
 
 namespace BetaCycle_Padova.Controllers.LTWorks
 {
@@ -20,6 +21,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
         {
             _context = context;
         }
+        
+        private static Logger OrderDetailNlogLogger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Retrieves all sales order details.
@@ -125,8 +128,8 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
             Console.WriteLine("Sei dentro Sales Order Header");
             try
-            {           
-               
+            {
+                OrderDetailNlogLogger.Info("Sales Order Detail Controller - Post Front End");
                 List<SalesOrderDetail> salesOrderDetail = [];
                 foreach (var detailFE in salesOrderDetailFE)
                 {
@@ -158,8 +161,9 @@ namespace BetaCycle_Padova.Controllers.LTWorks
 
                 return Ok();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                OrderDetailNlogLogger.Error(ex, "Sales Order Detail Controller - Post Front End");
                 return BadRequest();
             }
 
