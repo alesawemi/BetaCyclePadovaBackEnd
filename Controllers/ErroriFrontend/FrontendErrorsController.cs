@@ -53,6 +53,7 @@ namespace BetaCycle_Padova.Controllers.ErroriFrontend
             catch (DbUpdateException dbEx)
             {
                 FrontendErrorsNlogLogger.Error(dbEx, "PostFrontendError raised a 'DbUpdate' exception in the catch block");
+
                 return BadRequest(new { message = "DbUpdate Exception - see backend" });
             }
             catch (Exception ex)

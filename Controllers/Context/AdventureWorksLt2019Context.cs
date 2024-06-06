@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BetaCycle_Padova.Models.LTWorks;
+using BetaCycle_Padova.Models.LTWorks.Cart;
 using BetaCycle_Padova.Models.LTWorks.OptionsAndFilters;
 using BetaCycle_Padova.Models.LTWorks.Views;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,13 @@ public partial class AdventureWorksLt2019Context : DbContext
     public DbSet<PriceAndWeightMapping> PriceAndWeightOptions { get; set; }
     public DbSet<GenericView> GenericView { get; set; }
     public DbSet<ProductsView> ProductsView { get; set; }
+    #endregion
+
+    #region cart
+    //public virtual DbSet<TabCart> TabCarts { get; set; }
+    //public virtual DbSet<TabCartDetail> TabCartDetails { get; set; }
+
+    //public virtual DbSet<CompleteCart> CompleteCarts { get; set; }
     #endregion
 
     public virtual DbSet<AccessoriesView> AccessoriesViews { get; set; }
@@ -762,6 +770,57 @@ public partial class AdventureWorksLt2019Context : DbContext
             entity.Property(e => e.WarrantyPeriod).HasMaxLength(256);
             entity.Property(e => e.Wheel).HasMaxLength(256);
         });
+
+        #region cart
+        //modelBuilder.Entity<TabCart>(entity =>
+        //{
+        //    entity.HasKey(e => e.CartId);
+
+        //    entity.ToTable("tab.Cart");
+
+        //    entity.HasIndex(e => e.UserEmail, "UQ_userEmail").IsUnique();
+
+        //    entity.Property(e => e.CartId).HasColumnName("cartID");
+        //    entity.Property(e => e.UpdatedOn).HasColumnName("updatedOn");
+        //    entity.Property(e => e.UserEmail)
+        //        .HasMaxLength(50)
+        //        .HasColumnName("userEmail");
+        //});
+
+        //modelBuilder.Entity<TabCartDetail>(entity =>
+        //{
+        //    entity.HasKey(e => e.EntryId);
+
+        //    entity.ToTable("tab.CartDetails");
+
+        //    entity.Property(e => e.EntryId).HasColumnName("entryID");
+        //    entity.Property(e => e.CartId).HasColumnName("cartID");
+        //    entity.Property(e => e.ProductId).HasColumnName("productId");
+        //    entity.Property(e => e.Quantity).HasColumnName("quantity");
+
+        //    entity.HasOne(d => d.Cart).WithMany(p => p.TabCartDetails)
+        //        .HasForeignKey(d => d.CartId)
+        //        .OnDelete(DeleteBehavior.ClientSetNull)
+        //        .HasConstraintName("FK_tab.CartDetails_tab.Cart");
+        //});
+
+        //modelBuilder.Entity<CompleteCart>(entity =>
+        //{
+        //    entity.HasKey(e => e.EntryId);
+
+        //    entity.ToTable("CompleteCart");
+
+        //    entity.Property(e => e.EntryId).HasColumnName("entryID");
+        //    entity.Property(e => e.LastUpdateOn)
+        //        .HasColumnType("datetime")
+        //        .HasColumnName("lastUpdateOn");
+        //    entity.Property(e => e.ProductId).HasColumnName("productId");
+        //    entity.Property(e => e.Quantity).HasColumnName("quantity");
+        //    entity.Property(e => e.UserEmail)
+        //        .HasMaxLength(50)
+        //        .HasColumnName("userEmail");
+        //});
+        #endregion
 
         OnModelCreatingPartial(modelBuilder);
     }

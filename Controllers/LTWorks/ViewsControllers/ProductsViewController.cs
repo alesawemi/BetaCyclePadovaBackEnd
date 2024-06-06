@@ -34,6 +34,29 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
         private static Logger ProductsViewNlogLogger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// Retrieves all products from the corresponding view.
+        /// </summary>
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProductsView>>> GetAll()
+        {
+            try
+            {
+                ProductsViewNlogLogger.Info("Products View Controller - GetAll");
+
+                return await _context.ProductsView.FromSqlRaw(
+                                        $"SELECT * FROM [dbo].[vProductsView]"
+                                    ).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                ProductsViewNlogLogger.Error(ex, "Products View Controller - Exception thrown from " +
+                    "GetAll");
+
+                return BadRequest(new { message = "Exception thrown from GetAll in Products View Controller." });
+            }
+        }
+
+        /// <summary>
         /// Retrieves products matching the given parameter from the view.
         /// </summary>
         /// <param name="param">The search parameter.</param>
@@ -55,11 +78,14 @@ namespace BetaCycle_Padova.Controllers.LTWorks.ViewsControllers
             }
             catch (Exception ex)
             {
-                ProductsViewNlogLogger.Error("Products View Controller - Exception thrown from " +
+                ProductsViewNlogLogger.Error(ex, "Products View Controller - Exception thrown from " +
                     "GetByParam");
 
                 return BadRequest(new { message = "Exception thrown from GetByParam in Products View Controller." });
             }
         }
+
+
+        
     }
 }
